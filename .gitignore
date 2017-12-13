@@ -4,3 +4,4 @@
 *.bak
 *.dir
 __pycache__
+*.pid
