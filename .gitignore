@@ -1,0 +1,6 @@
+.env
+*.pyc
+*.dat
+*.bak
+*.dir
+__pycache__
