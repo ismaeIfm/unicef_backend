@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 from temba_client.v2 import TembaClient
 
-TOKEN_MX = "8bfb6527b94aa97d3dc693daa5b98757ad25ffd6"
+#TOKEN_MX=
 
 mx_client = TembaClient('rapidpro.datos.gob.mx', TOKEN_MX)
 client = MongoClient('localhost', 27017)
