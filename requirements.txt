@@ -1,0 +1,5 @@
+Flask==0.12.2
+Flask-Script==2.0.6
+celery==4.1.0
+rapidpro-python==2.2
+redis==2.10.6
