@@ -5,3 +5,4 @@
 *.dir
 __pycache__
 *.pid
+*.sqlite3
