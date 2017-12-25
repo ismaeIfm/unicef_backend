@@ -5,4 +5,5 @@
 *.dir
 __pycache__
 *.pid
-*.sqlite3
+preprocess/commands.sh
+preprocess/definitions.json
