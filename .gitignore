@@ -5,3 +5,5 @@
 *.dir
 __pycache__
 *.pid
+preprocess/commands.sh
+preprocess/definitions.json
