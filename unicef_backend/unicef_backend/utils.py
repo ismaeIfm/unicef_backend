@@ -35,7 +35,7 @@ def date_decorator(function):
     return wrapper
 
 
-def auxiliar_map_reduce(mapper,reducer = None,query = {}):
+def auxiliar_map_reduce(mapper,reducer = None,query = {}, database="contacts"):
     """ Auxiliar map reduce, if we need to count, we use format key {count:1}
         Keyword arguments:
         mapper  -- string of map function
@@ -48,7 +48,7 @@ def auxiliar_map_reduce(mapper,reducer = None,query = {}):
                             values.forEach(function(value) {
                                result.count += value.count; })
                             return result; }'''
-    results = db["contacts"].map_reduce(mapper, reducer, "states",query=query)
+    results = db[database].map_reduce(mapper, reducer, "states",query=query)
     return  [i for i in  results.find()]
 
 
