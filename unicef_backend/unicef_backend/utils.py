@@ -1,5 +1,9 @@
 import re
-from datetime import timedelta
+            iilter_date["$lt"] = parse(filter_date["$lt"])+relativedelta(months=9)
+from dateutil.relativedelta import relativedelta
+from datetime import timedelta, datetime
+from dateutil.parser import parse
+
 
 ##################  Connection to mongo  ##################
 from pymongo import MongoClient
@@ -28,9 +32,9 @@ def date_decorator(function):
         end_date = kwargs["end_date"] if "end_date" in kwargs else ""
         filter_date = {}
         if start_date:
-            filter_date["$gte"] = start_date
+            filter_date["$gte"] = start_date.isoformat()
         if end_date:
-            filter_date["$lte"] = end_date
+            filter_date["$lt"] = end_date.isoformat()
         if filter_date:
             kwargs["filter_date"] = filter_date
         kwargs.pop('start_date', None)
@@ -59,19 +63,6 @@ def auxiliar_map_reduce(mapper,reducer = None,query = {}, database="contacts"):
 #################### End Auxiliar functions ##################
 
 ########## Pendientes
-#De ser historica, implica un conteo doble Pendiente
-def get_contacts_by_group():
-    """ Function to obtain number of contacts by category type:
-        personal, pregnant, or with baby """
-    # Get personal type (Filter by group)
-    personal_contacts = db["contacts"].find({'groups.name':'PERSONAL_SALUD'}).count()
-    # Get pregnant type (Filter by group)
-    pregnant_contacts = db["contacts"].find({'groups.name':'PREGNANT_MS'}).count()
-    # Get baby type (Filter by variable)
-    baby_contacts = db["contacts"].find({'fields.rp_ispregnant':'0'}).count()
-    return {"baby":baby_contacts,
-            "pregnant": pregnant_contacts,
-            "personal":personal_contacts}
 
 @date_decorator
 def get_mother_age(query={}):
@@ -134,6 +125,38 @@ def get_mom_age_by_mun(state, filter_date = {}):
 ##########################################################################
 #                             Contacts part                              #
 ##########################################################################
+
+@date_decorator
+def get_contacts_by_group(filter_date={}):
+    """ Function to obtain number of contacts by category type:
+        personal, pregnant, or with baby """
+    # Get personal type (Filter by group) 
+    query={"group.name":"PERSONAL_SALUD"}
+    if filter_date:
+        query["created_on"] = filter_date 
+    personal_contacts = db["contacts"].find(query).count() 
+    # Get pregnant type (Filter by group)
+    if filter_date:
+        if "$lt" in filter_date:
+            filter_date["$lt"] = parse(filter_date["$lt"])+relativedelta(months=9)
+            filter_date["$lt"] = filter_date["$lt"].isoformat()
+        query = {"fields.rp_duedate": filter_date}
+    else:
+        query = {'fields.rp_ispregnant':'1'} 
+    pregnant_contacts = db["contacts"].find(query).count()
+    # Get baby type (Filter by variable)
+    if filter_date:
+        if "$gte" in filter_date:
+            filter_date["$gte"] = parse(filter_date["$gte"])-relativedelta(years=2)
+            filter_date["$gte"] = filter_date["$gte"].isoformat()
+        query = {"fields.rp_deliverydate": filter_date}
+    else:
+        query = {'fields.rp_ispregnant':'0'} 
+    baby_contacts = db["contacts"].find(query).count()
+    return {"baby":baby_contacts,
+            "pregnant": pregnant_contacts,
+            "personal":personal_contacts}
+
 @date_decorator
 def get_contacts_by_channel(filter_date = {},query = {}):
     """ Function to obtain number of contacts by channel type: facebook, sms
@@ -211,7 +234,8 @@ def get_babies_by_state(filter_date={}):
     """
     if filter_date:
         if "$gte" in filter_date:
-            filter_date["$gte"] = filter_date["$gte"]-timedelta(years=2)
+            filter_date["$gte"] = parse(filter_date["$gte"])-relativedelta(years=2)
+            filter_date["$gte"] = filter_date["$gte"].isoformat()
         query = {"fields.rp_deliverydate": filter_date}
     else:
         query = {'fields.rp_ispregnant':'0'}
@@ -228,7 +252,8 @@ def get_babies_by_municipio(state_number, filter_date={}):
     """
     if filter_date:
         if "$gte" in filter_date:
-            filter_date["$gte"] = filter_date["$gte"]-timedelta(years=2)
+            filter_date["$gte"] = filter_date["$gte"]-relativedelta(years=2)
+            filter_date["$gte"] = filter_date["$gte"].isoformat()
         query = {"fields.rp_deliverydate": filter_date}
 
     else:
@@ -245,7 +270,8 @@ def get_babies_by_hospital(filter_date = {}):
     """
     if filter_date:
         if "$gte" in filter_date:
-            filter_date["$gte"] = filter_date["$gte"]-timedelta(years=2)
+            filter_date["$gte"] = filter_date["$gte"]-relativedelta(years=2)
+            filter_date["$gte"] = filter_date["$gte"].isoformat()
         query = {"fields.rp_deliverydate": filter_date}
 
     else:
@@ -264,8 +290,9 @@ def get_pregnant_by_state(filter_date = {}):
         end_date   -- datetime end date filter (optional)
     """
     if filter_date:
-        if "$lte" in filter_date:
-            filter_date["$lte"] = filter_date["$lte"]+timedelta(months=9)
+        if "$lt" in filter_date:
+            filter_date["$lt"] = parse(filter_date["$lt"])+relativedelta(months=9)
+            filter_date["$lt"] = filter_date["$lt"].isoformat()
         query = {"fields.rp_duedate": filter_date}
     else:
         query = {'fields.rp_ispregnant':'1'}
@@ -332,8 +359,9 @@ def get_pregnant_by_municipio(state, filter_date = {}):
         end_date   -- datetime end date filter   (optional)
     """
     if filter_date:
-         if "$lte" in filter_date:
-             filter_date["$lte"] = filter_date["$lte"]+timedelta(months=9)
+         if "$lt" in filter_date:
+             filter_date["$lt"] = parse(filter_date["$lt"])+relativedelta(months=9)
+             filter_date["$lt"] = filter_date["$lt"].isoformat()
          query = {"fields.rp_duedate": filter_date}
     else:
          query = {'fields.rp_ispregnant':'1'}
