@@ -389,3 +389,52 @@ def get_channel_by_municipio(state, filter_date = {}):
             mun_channels[m] = get_contacts_by_channel(query=query)
     return mun_channels
 
+
+##########################################################################
+#                             Msgs part                                  #
+##########################################################################
+@date_decorator
+def get_sent_msgs_by_state(filter_date = {}):
+    """ Return number of msgs sent by state inegi number
+        Keyword arguments:
+        start_date -- datetime start date filter (optional)
+        end_date   -- datetime end date filter  (optional)
+    """
+    query = {}
+    if filter_date:
+        query["time"] = filter_date
+    mapper = 'function() { emit(this.rp_state_number,{ count: 1});}'
+    return  auxiliar_map_reduce(mapper,query=query, database="runs")
+
+
+@date_decorator
+def get_sent_msgs_by_mun(state_number, filter_date = {}):
+    """ Return number of msgs sent by municipio depends on state inegi number 
+        Keyword arguments:
+        state_number -- state number inegi 
+        start_date -- datetime start date filter (optional)
+        end_date   -- datetime end date filter  (optional)
+    """
+    query = {}
+    if filter_date:
+        query["time"] = filter_date
+    query["rp_state_number"] = str(state_number)
+    mapper = 'function() { emit(this.rp_mun, { count: 1});}'
+    return auxiliar_map_reduce(mapper,query=query, database="runs")
+
+
+@date_decorator
+def get_sent_msgs_by_flow(filter_date =  {}):
+    """ Return number of msgs sent by flow 
+        Keyword arguments:
+        state_number -- state number inegi 
+        start_date -- datetime start date filter (optional)
+        end_date   -- datetime end date filter  (optional)
+    """
+    query = {}
+    if filter_date:
+        query["time"] = filter_date 
+    mapper = 'function() { emit(this.flow_name, { count: 1});}'
+    all_flows =  auxiliar_map_reduce(mapper,query=query, database="runs")
+    all_flows = sorted(all_flows, key=lambda k: k["value"]["count"],reverse = True) 
+    return  [{f["_id"]:f["value"]["count"]} for f in all_flows][:10]
