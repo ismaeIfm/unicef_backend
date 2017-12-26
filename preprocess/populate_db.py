@@ -130,9 +130,9 @@ def update_runs(after=None, last_runs=None):
 # Secuencia para tener datos verdaderos en la base de datos 
 # Sin descargar toda la base
 download_contacts()
-#after = datetime.utcnow() - timedelta(days=1)
-#after = after.isoformat()
-#update_runs(after)
+after = datetime.utcnow() - timedelta(days=1)
+after = after.isoformat()
+update_runs(after)
 
 print ("Descargando alerta")
 #Temporal download mialerta runs
