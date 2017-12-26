@@ -13,7 +13,10 @@ MOM_AGE_C1 = 18
 MOM_AGE_C2 = 35
 FIELDS_STATE = "fields.rp_state_number"
 MIALERTA_FLOW = "07d56699-9cfb-4dc6-805f-775989ff5b3f"
-MIALERTA_NODE = "response_1"
+MIALERTA_NODE = "response_1" 
+CANCEL_FLOW = "dbd5738f-8700-4ece-8b8c-d68b3f4529f7"
+CANCEL_NODE = "response_3"
+
 
 ####################### Auxiliar functions ##################
 def date_decorator(function):
@@ -440,75 +443,63 @@ def get_sent_msgs_by_flow(filter_date =  {}):
     all_flows = sorted(all_flows, key=lambda k: k["value"]["count"],reverse = True) 
     return  [{f["_id"]:f["value"]["count"]} for f in all_flows][:10]
 
-
 ##########################################################################
-#                         Mi alerta                                      #
-##########################################################################
-
-def auxiliar_mialerta(query):
+#                          Auxiliar flows                                #
+########################################################################## 
+def auxiliar_mialerta(filter_date, query):
+    if filter_date:
+        query["time"] = filter_date 
     query["flow_uuid"] = MIALERTA_FLOW
     mapper = 'function() { emit(this.flow_name, { count: 1});}'
     return auxiliar_map_reduce(mapper,query=query, database="runs")
 
 
-@date_decorator
-def get_mialerta_mom(filter_date = {}):
-    """ Return mialerta runs of mother perfil
-        Keyword arguments:
+def auxiliar_cancel_reasons(filter_date, query):
+    """ Keyword arguments:
         start_date -- datetime start date filter (optional)
         end_date   -- datetime end date filter (optional)
     """
-    query = {'rp_ispregnant':'0'}
+    query["node"]= CANCEL_NODE
+    query["flow_uuid"]=CANCEL_FLOW
     if filter_date:
-        query["time"]= filter_date
-    return auxiliar_mialerta(query)
-    
+        query["time"] = filter_date 
+    mapper = 'function() { emit(this.category, { count: 1});}'
+    return auxiliar_map_reduce(mapper,query=query, database="values")
 
-@date_decorator
-def get_mialerta_personal(filter_date = {}):
-    """Keyword arguments:
-        start_date -- datetime start date filter (optional)
-        end_date   -- datetime end date filter   (optional)
-    """
+
+def get_flow_by_group(method,filter_date={}):
+    result = {}
+    #Mother
+    query = {'rp_ispregnant':'1'}
+    result["baby"] = method(filter_date,query)
+    #Pregnant
+    query = {'rp_ispregnant':'0'} 
+    result["pregnant"] = method(filter_date,query)
+    #Personal
     query = {'groups.name':'PERSONAL_SALUD'}
-    if filter_date:
-        query["time"] = filter_date
-    return auxiliar_mialerta(query)
+    result["personal"] = method(filter_date,query)
+    return result
 
 
-@date_decorator
-def get_mialerta_pregnant(filter_date = {}):
+def get_flow_by_state(flow_uuid, filter_date = {}):
     """Keyword arguments:
         start_date -- datetime start date filter (optional)
         end_date   -- datetime end date filter   (optional)
     """
-    query = {'rp_ispregnant': '1'}
-    if filter_date:
-         query["time"]= filter_date
-    return auxiliar_mialerta(query)
-
-
-@date_decorator
-def get_mialerta_by_state(filter_date = {}):
-    """Keyword arguments:
-        start_date -- datetime start date filter (optional)
-        end_date   -- datetime end date filter   (optional)
-    """
-    query= {"flow_uuid" : MIALERTA_FLOW}
+    query= {"flow_uuid" : flow_uuid}
     if filter_date:
         query["time"] = filter_date
     mapper = 'function(){ emit(this.rp_state_number, { count: 1});}'
     return auxiliar_map_reduce(mapper,query=query, database="runs")
 
 
-@date_decorator
-def get_mialerta_by_mun(state_number,filter_date = {}):
+def get_flow_by_mun(state_number,flow_uuid,filter_date = {}):
     """Keyword arguments:
         state_number -- state number inegi 
         start_date -- datetime start date filter (optional)
         end_date   -- datetime end date filter   (optional)
     """
-    query= {"flow_uuid" : MIALERTA_FLOW}
+    query= {"flow_uuid" : flow_uuid}
     if filter_date:
         query["time"] = filter_date
     query["rp_state_number"] = str(state_number)
@@ -516,26 +507,24 @@ def get_mialerta_by_mun(state_number,filter_date = {}):
     return auxiliar_map_reduce(mapper,query=query, database="runs")
 
 
-@date_decorator
-def get_mialerta_by_hospital(filter_date = {}):
+def get_flow_by_hospital(flow_uuid, filter_date = {}):
     """Keyword arguments:
         start_date -- datetime start date filter (optional)
         end_date   -- datetime end date filter   (optional)
     """
-    query= {"flow_uuid" : MIALERTA_FLOW}
+    query= {"flow_uuid" : flow_uuid}
     if filter_date:
         query["time"] = filter_date
     mapper = 'function() { emit(this.rp_atenmed, { count: 1});}'
     return auxiliar_map_reduce(mapper,query=query, database="runs")
 
 
-@date_decorator
-def get_mialerta_by_channel(filter_date = {}):
+def get_flow_by_channel(flow_uuid, filter_date = {}):
     """ Keyword arguments:
         start_date -- datetime start date filter (optional)
         end_date   -- datetime end date filter (optional)
     """
-    query= {"flow_uuid" : MIALERTA_FLOW}
+    query= {"flow_uuid" : flow_uuid}
     if filter_date:
         query["time"] = filter_date 
     fb_regx = re.compile("^facebook", re.IGNORECASE)
@@ -548,6 +537,32 @@ def get_mialerta_by_channel(filter_date = {}):
     sms_contacts = db["runs"].find(query).count()
     return {"fb":facebook_contacts, "sms": sms_contacts}
 
+##########################################################################
+#                         Mi alerta       (use flow auxiliar methods)    #
+##########################################################################
+@date_decorator
+def get_mialerta_by_group(filter_date = {}):
+    return get_flow_by_group(auxiliar_mialerta,filter_date)
+    
+@date_decorator
+def get_mialerta_by_state(filter_date = {}):
+    return get_flow_by_state(MIALERTA_FLOW,filter_date)
+
+
+@date_decorator
+def get_mialerta_by_mun(state_number,filter_date = {}):
+    return get_flow_by_mun(state_number,MIALERTA_FLOW,filter_date) 
+
+
+@date_decorator
+def get_mialerta_by_hospital(filter_date = {}):
+    return get_flow_by_hospital(MIALERTA_FLOW, filter_date)
+
+
+@date_decorator
+def get_mialerta_by_channel(filter_date = {}):
+    return get_flow_by_channel(MIALERTA_FLOW, filter_date)
+
 
 @date_decorator
 def get_mialerta_msgs_top(filter_date = {}):
@@ -555,11 +570,33 @@ def get_mialerta_msgs_top(filter_date = {}):
         start_date -- datetime start date filter (optional)
         end_date   -- datetime end date filter (optional)
     """
-    query = {"node": MIALERTA_NODE}
+    query = {"node": MIALERTA_NODE, "flow_uuid":MIALERTA_FLOW}
     if filter_date:
         query["time"] = filter_date 
     mapper = 'function() { emit(this.category, { count: 1});}'
     return auxiliar_map_reduce(mapper,query=query, database="values")
 
 
+##########################################################################
+#                        Cancel part   (Use flow auxiliar methods)       #
+##########################################################################
+@date_decorator
+def get_cancel_by_group(filter_date = {}):
+    return get_flow_by_group(auxiliar_cancel_reasons,filter_date) 
+
+@date_decorator
+def get_cancel_by_state(filter_date = {}):
+    return get_flow_by_state(CANCEL_FLOW,filter_date)
+
+@date_decorator
+def get_cancel_by_mun(state_number,filter_date = {}):
+    return get_flow_by_mun(state_number,CANCEL_FLOW,filter_date) 
+
+@date_decorator
+def get_cancel_by_hospital(filter_date = {}):
+    return get_flow_by_hospital(CANCEL_FLOW, filter_date)
+
+@date_decorator
+def get_cancel_by_channel(filter_date = {}):
+    return get_flow_by_channel(CANCEL_FLOW, filter_date)
 
