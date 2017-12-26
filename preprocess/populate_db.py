@@ -1,7 +1,7 @@
 from bson.errors import InvalidDocument
 from pymongo import MongoClient
 from tqdm import tqdm
-
+from datetime import datetime, timedelta
 from dateutil.parser import parse
 from temba_client.v2 import TembaClient
 
@@ -51,3 +51,60 @@ for c in tqdm(
             'uuid': c.uuid
          })
 
+##################### To add to tasks ###########################
+
+
+def insert_one_contact(c):
+    c.fields["rp_duedate"] = format_date(c.fields, "rp_duedate")
+    c.fields["rp_deliverydate"] = format_date(c.fields,"rp_deliverydate")
+    db['contacts'].insert_one({
+                 'blocked': c.blocked,
+                 'created_on': c.created_on,
+                 'fields': c.fields,
+                 'groups': [{'uuid':i.uuid, 'name':i.name} for i in c.groups],
+                 'language': c.language,
+                 'modified_on': c.modified_on,
+                 'name': c.name,
+                 'stopped': c.stopped,
+                 'urns': c.urns,
+                 'uuid': c.uuid 
+    })
+
+def update_runs(after):
+    last_runs = mx_client.get_runs(after = after).all(retry_on_rate_exceed=True)
+    for run in last_runs: 
+        for path_item in run.path:
+          #Search action
+          action = db["actions"].find_one({"action_id":path_item.node})
+          if not action:
+              #We ignore the path item if has a split or a group action
+              continue
+          # Search contact 
+          contact = db["contacts"].find_one({"uuid": run.contact.uuid})
+          if not contact: #Need to update datebase 
+              contacts = mx_client.get_contacts(uuid=run.contact.uuid)
+              if contacts:
+                  c = contacts[0]
+                  contact = c.serialize()
+                  insert_one_contact(c) 
+          db['runs'].insert_one({
+                  'flow_uuid': run.flow.uuid,
+                  'flow_name': run.flow.name,
+                  'time': path_item.time,
+                  'action_uuid': action["action_id"],
+                  'msg': action["msg"],
+                  'contact_uuid': run.contact.uuid,
+                  'rp_deliverydate': contact["fields"]["rp_deliverydate"],
+                  'rp_duedate': contact["fields"]["rp_duedate"],
+                  'rp_state_number': contact["fields"]["rp_state_number"],
+                  'rp_mun': contact["fields"]["rp_mun"],
+                  'urns': contact["urns"],
+                  })
+    
+#################### Download  runs one day ###########################
+
+#last_messages = mx_client.get_messages(after=after, folder="sent").all(retry_on_rate_exceed=True)
+after = datetime.utcnow() - timedelta(days=1)
+after = after.isoformat()
+update_runs(after)
+   
