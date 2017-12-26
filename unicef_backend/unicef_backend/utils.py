@@ -12,7 +12,8 @@ db = client['test-db']
 MOM_AGE_C1 = 18
 MOM_AGE_C2 = 35
 FIELDS_STATE = "fields.rp_state_number"
-
+MIALERTA_FLOW = "07d56699-9cfb-4dc6-805f-775989ff5b3f"
+MIALERTA_NODE = "response_1"
 
 ####################### Auxiliar functions ##################
 def date_decorator(function):
@@ -438,3 +439,127 @@ def get_sent_msgs_by_flow(filter_date =  {}):
     all_flows =  auxiliar_map_reduce(mapper,query=query, database="runs")
     all_flows = sorted(all_flows, key=lambda k: k["value"]["count"],reverse = True) 
     return  [{f["_id"]:f["value"]["count"]} for f in all_flows][:10]
+
+
+##########################################################################
+#                         Mi alerta                                      #
+##########################################################################
+
+def auxiliar_mialerta(query):
+    query["flow_uuid"] = MIALERTA_FLOW
+    mapper = 'function() { emit(this.flow_name, { count: 1});}'
+    return auxiliar_map_reduce(mapper,query=query, database="runs")
+
+
+@date_decorator
+def get_mialerta_mom(filter_date = {}):
+    """ Return mialerta runs of mother perfil
+        Keyword arguments:
+        start_date -- datetime start date filter (optional)
+        end_date   -- datetime end date filter (optional)
+    """
+    query = {'rp_ispregnant':'0'}
+    if filter_date:
+        query["time"]= filter_date
+    return auxiliar_mialerta(query)
+    
+
+@date_decorator
+def get_mialerta_personal(filter_date = {}):
+    """Keyword arguments:
+        start_date -- datetime start date filter (optional)
+        end_date   -- datetime end date filter   (optional)
+    """
+    query = {'groups.name':'PERSONAL_SALUD'}
+    if filter_date:
+        query["time"] = filter_date
+    return auxiliar_mialerta(query)
+
+
+@date_decorator
+def get_mialerta_pregnant(filter_date = {}):
+    """Keyword arguments:
+        start_date -- datetime start date filter (optional)
+        end_date   -- datetime end date filter   (optional)
+    """
+    query = {'rp_ispregnant': '1'}
+    if filter_date:
+         query["time"]= filter_date
+    return auxiliar_mialerta(query)
+
+
+@date_decorator
+def get_mialerta_by_state(filter_date = {}):
+    """Keyword arguments:
+        start_date -- datetime start date filter (optional)
+        end_date   -- datetime end date filter   (optional)
+    """
+    query= {"flow_uuid" : MIALERTA_FLOW}
+    if filter_date:
+        query["time"] = filter_date
+    mapper = 'function(){ emit(this.rp_state_number, { count: 1});}'
+    return auxiliar_map_reduce(mapper,query=query, database="runs")
+
+
+@date_decorator
+def get_mialerta_by_mun(state_number,filter_date = {}):
+    """Keyword arguments:
+        state_number -- state number inegi 
+        start_date -- datetime start date filter (optional)
+        end_date   -- datetime end date filter   (optional)
+    """
+    query= {"flow_uuid" : MIALERTA_FLOW}
+    if filter_date:
+        query["time"] = filter_date
+    query["rp_state_number"] = str(state_number)
+    mapper = 'function() { emit(this.rp_mun, { count: 1});}'
+    return auxiliar_map_reduce(mapper,query=query, database="runs")
+
+
+@date_decorator
+def get_mialerta_by_hospital(filter_date = {}):
+    """Keyword arguments:
+        start_date -- datetime start date filter (optional)
+        end_date   -- datetime end date filter   (optional)
+    """
+    query= {"flow_uuid" : MIALERTA_FLOW}
+    if filter_date:
+        query["time"] = filter_date
+    mapper = 'function() { emit(this.rp_atenmed, { count: 1});}'
+    return auxiliar_map_reduce(mapper,query=query, database="runs")
+
+
+@date_decorator
+def get_mialerta_by_channel(filter_date = {}):
+    """ Keyword arguments:
+        start_date -- datetime start date filter (optional)
+        end_date   -- datetime end date filter (optional)
+    """
+    query= {"flow_uuid" : MIALERTA_FLOW}
+    if filter_date:
+        query["time"] = filter_date 
+    fb_regx = re.compile("^facebook", re.IGNORECASE)
+    sms_regx = re.compile("^tel", re.IGNORECASE)
+    # Get facebook contacts
+    query["urns"] = fb_regx
+    facebook_contacts = db["runs"].find(query).count()
+    # Get sms contacts
+    query["urns"] = sms_regx
+    sms_contacts = db["runs"].find(query).count()
+    return {"fb":facebook_contacts, "sms": sms_contacts}
+
+
+@date_decorator
+def get_mialerta_msgs_top(filter_date = {}):
+    """ Keyword arguments:
+        start_date -- datetime start date filter (optional)
+        end_date   -- datetime end date filter (optional)
+    """
+    query = {"node": MIALERTA_NODE}
+    if filter_date:
+        query["time"] = filter_date 
+    mapper = 'function() { emit(this.category, { count: 1});}'
+    return auxiliar_map_reduce(mapper,query=query, database="values")
+
+
+

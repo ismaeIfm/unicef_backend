@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from dateutil.parser import parse
 from temba_client.v2 import TembaClient
 
+import load_flows 
 TOKEN_MX="0032fe79dbddceae3f4a86e86a726e16b88ec88e"
 
 mx_client = TembaClient('rapidpro.datos.gob.mx', TOKEN_MX)
@@ -30,27 +31,28 @@ def format_date(fields_dic, key):
 
 
 ########################### Download data ################################
-for c in tqdm(
+def download_contacts():
+    for c in tqdm(
         mx_client.get_contacts().all(),
         desc='==> Getting Contacts'):
-    #Only save misalud contacts
-    if not "MIGRACION_PD"  in [i.name for i in c.groups]:
-        #Normalize date
-        c.fields["rp_duedate"] = format_date(c.fields, "rp_duedate")
-        c.fields["rp_deliverydate"] = format_date(c.fields,"rp_deliverydate")
-        db['contacts'].insert_one({
-            'blocked': c.blocked,
-            'created_on': c.created_on,
-            'fields': c.fields,
-            'groups': [{'uuid':i.uuid, 'name':i.name} for i in c.groups],
-            'language': c.language,
-            'modified_on': c.modified_on,
-            'name': c.name,
-            'stopped': c.stopped,
-            'urns': c.urns,
-            'uuid': c.uuid
-         })
-
+        #Only save misalud contacts
+        if not "MIGRACION_PD"  in [i.name for i in c.groups]:
+            #Normalize date
+            c.fields["rp_duedate"] = format_date(c.fields, "rp_duedate")
+            c.fields["rp_deliverydate"] = format_date(c.fields,"rp_deliverydate")
+            db['contacts'].insert_one({
+                'blocked': c.blocked,
+                'created_on': c.created_on,
+                'fields': c.fields,
+                'groups': [{'uuid':i.uuid, 'name':i.name} for i in c.groups],
+                'language': c.language,
+                'modified_on': c.modified_on,
+                'name': c.name,
+                'stopped': c.stopped,
+                'urns': c.urns,
+                'uuid': c.uuid
+             })
+    
 ##################### To add to tasks ###########################
 
 
@@ -70,9 +72,20 @@ def insert_one_contact(c):
                  'uuid': c.uuid 
     })
 
-def update_runs(after):
-    last_runs = mx_client.get_runs(after = after).all(retry_on_rate_exceed=True)
-    for run in last_runs: 
+def insert_value_run(run):
+    for value in run.values:
+        db['values'].insert_one({
+                           'node': value,
+                           'category':run.values[value].category,
+                           'time': run.values[value].time,
+                           'response': run.values[value].value})
+
+def update_runs(after=None, last_runs=None):
+    if not last_runs:
+        last_runs = mx_client.get_runs(after = after).all(retry_on_rate_exceed=True)
+    for run in last_runs:
+        #if run.flow.uuid == "07d56699-9cfb-4dc6-805f-775989ff5b3f": #MiAlerta
+        #    insert_value_run(run)
         for path_item in run.path:
           #Search action
           action = db["actions"].find_one({"action_id":path_item.node})
@@ -86,7 +99,7 @@ def update_runs(after):
               if contacts:
                   c = contacts[0]
                   contact = c.serialize()
-                  insert_one_contact(c) 
+                  insert_one_contact(c)
           db['runs'].insert_one({
                   'flow_uuid': run.flow.uuid,
                   'flow_name': run.flow.name,
@@ -99,12 +112,22 @@ def update_runs(after):
                   'rp_state_number': contact["fields"]["rp_state_number"],
                   'rp_mun': contact["fields"]["rp_mun"],
                   'urns': contact["urns"],
+                  'rp_atenmed': contact["fields"]["rp_atenmed"],
+                  'rp_ispregnant': contact["fields"]["rp_ispregnant"],
+                  'groups': [{'uuid':i["uuid"], 'name':i["name"]} for i in contact["groups"]]
                   })
     
-#################### Download  runs one day ###########################
+#################### Download  temporal data  ###########################
 
-#last_messages = mx_client.get_messages(after=after, folder="sent").all(retry_on_rate_exceed=True)
+download_contacts()
 after = datetime.utcnow() - timedelta(days=1)
 after = after.isoformat()
 update_runs(after)
+
+#Temporal download mialerta runs
+runs = mx_client.get_runs(flow="07d56699-9cfb-4dc6-805f-775989ff5b3f").all()
+update_runs(last_runs=runs)
+for run in runs:
+    insert_value_run(run)
+    
    
