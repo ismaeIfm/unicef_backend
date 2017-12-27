@@ -27,7 +27,7 @@ def format_date(fields_dic, key):
             return parse(item).isoformat()
         except ValueError:
             pass
-    return item
+    return None
 
 
 ########################### Download data ################################
