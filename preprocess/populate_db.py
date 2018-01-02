@@ -27,7 +27,7 @@ def format_date(fields_dic, key):
             return parse(item).isoformat()
         except ValueError:
             pass
-    return item
+    return None
 
 
 ########################### Download data ################################
@@ -55,6 +55,21 @@ def download_contacts():
     
 ##################### To add to tasks ###########################
 
+def insert_one_contact(c):
+    c.fields["rp_duedate"] = format_date(c.fields, "rp_duedate")
+    c.fields["rp_deliverydate"] = format_date(c.fields,"rp_deliverydate")
+    db['contacts'].insert_one({
+                 'blocked': c.blocked,
+                 'created_on': c.created_on,
+                 'fields': c.fields,
+                 'groups': [{'uuid':i.uuid, 'name':i.name} for i in c.groups],
+                 'language': c.language,
+                 'modified_on': c.modified_on,
+                 'name': c.name,
+                 'stopped': c.stopped,
+                 'urns': c.urns,
+                 'uuid': c.uuid 
+    })
 
 def create_base_node(run,contact):
         return {  'flow_uuid': run.flow.uuid,
