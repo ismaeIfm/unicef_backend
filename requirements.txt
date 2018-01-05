@@ -3,3 +3,5 @@ Flask-Script==2.0.6
 celery==4.1.0
 rapidpro-python==2.2
 redis==2.10.6
+elasticsearch-dsl==5.3.0
+tqdm==4.15.0
