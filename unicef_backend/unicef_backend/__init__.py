@@ -2,6 +2,7 @@ import os
 
 from flask import Flask
 from celery import Celery
+from elasticsearch_dsl.connections import connections
 
 from config import config
 
@@ -14,6 +15,9 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     celery.config_from_object(app.config)
+
+    connections.create_connection(
+        hosts=[app.config['ELASTICSEARCH_HOST']], timeout=20)
 
     from unicef_backend.views import api
     app.register_blueprint(api)
