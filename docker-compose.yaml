@@ -12,6 +12,11 @@ services:
         image: mongo
         ports:
             - "27017:27017"
+    # ELS
+    elasticsearch:
+        image: elasticsearch
+        ports:
+            - "9200:9200"
 
     # API
     unicef-backend:
@@ -24,6 +29,7 @@ services:
         env_file: .env
         volumes:
             - ./unicef_backend:/app
+            - ./preprocess/actions.json:/app/actions.json
         ports:
             - "5000:5000"
         depends_on:
