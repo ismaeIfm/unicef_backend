@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime, timedelta
 
 from dateutil.parser import parse
@@ -10,7 +11,7 @@ from temba_client.v2 import TembaClient
 from tqdm import tqdm
 
 from unicef_backend import create_app
-from unicef_backend.indexes import Action, Contact, Group, Run, Value
+from unicef_backend.indexes import Action, Contact, Run, Value
 
 app = create_app('development')
 mx_client = TembaClient('rapidpro.datos.gob.mx', os.getenv('TOKEN_MX'))
@@ -51,19 +52,19 @@ def load_flows(force=False):
 def insert_one_contact(c):
     c.fields["rp_duedate"] = format_date(c.fields, "rp_duedate")
     c.fields["rp_deliverydate"] = format_date(c.fields, "rp_deliverydate")
-    groups = []
-    for i in c.groups:
-        groups.append(i.uuid)
-        try:
-            g = Group.get(id=i.uuid)
-        except NotFoundError:
-            Group(**{'uuid': i.uuid, 'name': i.name, '_id': i.uuid}).save()
-
+    c.fields["rp_mialta_initms"] = format_date(c.fields, "rp_mialta_initms")
+    if c.fields["rp_mamaedad"]:
+        aux_rp_mamaedad = re.findall(r"(\d+)", c.fields["rp_mamaedad"])
+        c.fields["rp_mamaedad"] = int(
+            aux_rp_mamaedad.pop()) if aux_rp_mamaedad else None
     contact = {
         '_id': c.uuid,
         'urns': c.urns,
         'created_on': c.created_on,
-        'groups': groups,
+        'groups': [{
+            'uuid': i.uuid,
+            'name': i.name
+        } for i in c.groups],
         'modified_on': c.modified_on,
         'uuid': c.uuid,
         'name': c.name,
@@ -80,7 +81,7 @@ def insert_one_contact(c):
 @manager.command
 def download_contacts(force=False):
     Contact.init()
-    Group.init()
+    #Group.init()
     Run.init()
     Value.init()
     for c in tqdm(mx_client.get_contacts().all(), desc='==> Getting Contacts'):
