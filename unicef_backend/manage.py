@@ -12,10 +12,21 @@ from tqdm import tqdm
 
 from unicef_backend import create_app
 from unicef_backend.indexes import Action, Contact, Run, Value
+from unicef_backend.utils_els import _format_date, _format_str
 
 app = create_app('development')
 mx_client = TembaClient('rapidpro.datos.gob.mx', os.getenv('TOKEN_MX'))
 manager = Manager(app)
+
+CONTACT_FIELDS = {
+    'rp_deliverydate': _format_date,
+    'rp_state_number': _format_str,
+    'rp_ispregnant': _format_str,
+    'rp_mun': _format_str,
+    'rp_atenmed': _format_str,
+    'rp_Mamafechanac': _format_date,
+    'rp_duedate': _format_date
+}
 """
 Parse string date depends on format
 """
@@ -50,13 +61,7 @@ def load_flows(force=False):
 
 
 def insert_one_contact(c):
-    c.fields["rp_duedate"] = format_date(c.fields, "rp_duedate")
-    c.fields["rp_deliverydate"] = format_date(c.fields, "rp_deliverydate")
-    c.fields["rp_mialta_initms"] = format_date(c.fields, "rp_mialta_initms")
-    if c.fields["rp_mamaedad"]:
-        aux_rp_mamaedad = re.findall(r"(\d+)", c.fields["rp_mamaedad"])
-        c.fields["rp_mamaedad"] = int(
-            aux_rp_mamaedad.pop()) if aux_rp_mamaedad else None
+    fields = {k: v(c.fields.get(k, '')) for k, v in CONTACT_FIELDS.items()}
     contact = {
         '_id': c.uuid,
         'urns': c.urns,
@@ -69,7 +74,7 @@ def insert_one_contact(c):
         'uuid': c.uuid,
         'name': c.name,
         'language': c.language,
-        'fields': c.fields,
+        'fields': fields,
         'stopped': c.stopped,
         'blocked': c.blocked
     }

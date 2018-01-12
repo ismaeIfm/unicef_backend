@@ -78,13 +78,13 @@ class Contact(DocType):
     name = Keyword()
     language = Keyword()
     fields = Object(properties={
-        "rp_mamaedad": Integer(),
-        "rp_state_number": Keyword(),
-        "rp_mun": Keyword(),
-        "rp_duedate": Date(),
-        "rp_deliverydate": Date(),
-        "rp_mialta_initms": Date(),
-        'rp_atenmed': Keyword()
+    'rp_deliverydate': Date(),
+    'rp_state_number': Keyword(),
+    'rp_ispregnant': Keyword(),
+    'rp_mun': Keyword(),
+    'rp_atenmed': Keyword(),
+    'rp_Mamafechanac': Date(),
+    'rp_duedate': Date()
     })
     stopped = Boolean()
     blocked = Boolean()
