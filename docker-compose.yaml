@@ -7,16 +7,13 @@ services:
         ports:
             - "6379:6379"
 
-    # Mongo
-    mongo:
-        image: mongo
-        ports:
-            - "27017:27017"
     # ELS
     elasticsearch:
         image: elasticsearch
         ports:
             - "9200:9200"
+        volumes:
+           - ./data:/usr/share/elasticsearch/data
 
     # API
     unicef-backend:
@@ -33,7 +30,7 @@ services:
         ports:
             - "5000:5000"
         depends_on:
-            - mongo
+            - elasticsearch
         links:
             - redis:redis
         entrypoint: ["python", "manage.py", "runserver",  "--host", "0.0.0.0", "--port", "5000", "--debug"]
@@ -49,10 +46,10 @@ services:
             - ./unicef_backend:/app
         depends_on:
             - redis
-            - mongo
+            - elasticsearch
         links:
             - redis:redis
-            - mongo:mongo
+            - elasticsearch:elasticsearch
         entrypoint: ["celery", "-A", "celery_worker:celery", "worker", "--loglevel=DEBUG"]
 
     # Celery beat
