@@ -68,6 +68,16 @@ def decorator(argument):
     return date_decorator
 
 
+@decorator('rp_deliverydate')
+def get_mom_age(filter=[], query=[]):
+    query.extend(filter)
+    s = Contact.search()
+    q = s.query('bool', must=query)
+    a = A('terms', field=FIELDS_STATE, size=2147483647)
+    q.aggs.bucket('per_state', a)
+    print(q.count())
+
+
 ########################PENDIENTE
 @decorator('rp_deliverydate')
 def get_mom_age_by_state(filter=[], query=[]):
@@ -442,12 +452,12 @@ def get_sent_msgs_by_state(filter=[]):
     a = A('terms', field='rp_state_number', size=2147483647)
     q.aggs.bucket('per_state', a)
 
+    q.aggs['per_state'].bucket(
+        'msgs_by_category', 'terms', field='msg', size=10)
+
     response = q.execute()
 
-    return {
-        i['key']: i['doc_count']
-        for i in response.aggregations.per_state.buckets
-    }
+    return response.aggregations.per_state.buckets
 
 
 @decorator('time')
@@ -456,6 +466,8 @@ def get_sent_msgs_by_mun(state, filter=[]):
     q = s.query('bool', must=filter + [Q('term', rp_state_number=state)])
     a = A('terms', field='rp_mun', size=2147483647)
     q.aggs.bucket('per_mun', a)
+
+    q.aggs['per_mun'].bucket('msgs_by_category', 'terms', field='msg', size=10)
 
     respose = q.execute()
 
@@ -469,13 +481,20 @@ def get_sent_msgs_by_mun(state, filter=[]):
 def get_sent_msgs_by_flow(filter=[]):
     s = Run.search()
     q = s.query('bool', must=filter)
-    a = A('terms', field='flow_name', size=2147483647)
+    a = A('terms', field='type', size=10)
     q.aggs.bucket('per_flow', a)
     response = q.execute()
+    return response.aggregations.per_flow.buckets
 
-    all_flows = response.aggregations.per_flow.buckets
-    all_flows = sorted(all_flows, key=lambda k: k['doc_count'], reverse=True)
-    return all_flows[:10]
+
+@decorator('rp_deliverydate')
+def get_sent_msgs_by_flow(filter=[]):
+    s = Run.search()
+    q = s.query('bool', must=filter)
+    a = A('terms', field='type', size=10)
+    q.aggs.bucket('per_flow', a)
+    response = q.execute()
+    return response.aggregations.per_flow.buckets
 
 
 ##########################################################################
@@ -487,8 +506,8 @@ def get_mialerta_by_group(filter=[]):
     s = Run.search()
     q = s.query('bool', must=[Q('term', flow_uuid=MIALERTA_FLOW)] + filter)
 
-    result['baby'] = q.query('term', rp_ispregnant='1').count()
-    result['pregnant'] = q.query('term', rp_ispregnant='0').count()
+    result['baby'] = q.query('term', rp_ispregnant='0').count()
+    result['pregnant'] = q.query('term', rp_ispregnant='1').count()
     result['personal'] = q.query('term', groups__name='PERSONAL_SALUD').count()
 
     return result

@@ -31,8 +31,10 @@ class Run(DocType):
         multi=True, properties={"name": Keyword(),
                                 "uuid": Keyword()})
     flow_name = Keyword()
+    type = Keyword()
     rp_deliverydate = Date()
     rp_state_number = Keyword()
+    rp_Mamafechanac = Date()
     action_uuid = Keyword()
     rp_atenmed = Keyword()
     time = Date()
@@ -78,13 +80,13 @@ class Contact(DocType):
     name = Keyword()
     language = Keyword()
     fields = Object(properties={
-    'rp_deliverydate': Date(),
-    'rp_state_number': Keyword(),
-    'rp_ispregnant': Keyword(),
-    'rp_mun': Keyword(),
-    'rp_atenmed': Keyword(),
-    'rp_Mamafechanac': Date(),
-    'rp_duedate': Date()
+        'rp_deliverydate': Date(),
+        'rp_state_number': Keyword(),
+        'rp_ispregnant': Keyword(),
+        'rp_mun': Keyword(),
+        'rp_atenmed': Keyword(),
+        'rp_Mamafechanac': Date(),
+        'rp_duedate': Date()
     })
     stopped = Boolean()
     blocked = Boolean()

@@ -89,7 +89,10 @@ def download_contacts(force=False):
     #Group.init()
     Run.init()
     Value.init()
-    for c in tqdm(mx_client.get_contacts().all(), desc='==> Getting Contacts'):
+    for c in tqdm(
+            mx_client.get_contacts(after=(
+                datetime.utcnow() - timedelta(days=30)).isoformat()).all(),
+            desc='==> Getting Contacts'):
         #Only save misalud contacts
         if not "MIGRACION_PD" in [i.name for i in c.groups]:
             #Normalize date
@@ -100,7 +103,7 @@ def search_contact(uuid):
     try:
         contact = Contact.get(id=uuid)
     except NotFoundError:  #Need to update datebase
-        contacts = mx_client.get_contacts(uuid=uuid)
+        contacts = mx_client.get_contacts(uuid=uuid).all()
         if contacts:
             c = contacts[0]
             contact = c.serialize()
@@ -122,6 +125,7 @@ def create_base_node(run, contact):
         'urns': contact["urns"],
         'rp_atenmed': contact.get("fields", {}).get("rp_atenmed"),
         'rp_ispregnant': contact.get("fields", {}).get("rp_ispregnant"),
+        'rp_Mamafechanac': contact.get("fields", {}).get("rp_Mamafechanac"),
         'groups': [i for i in contact.get("groups", [])]
     }
 
@@ -136,6 +140,35 @@ def insert_value_run(run):
         value_dic["time"] = run.values[value].time
         value_dic["response"] = run.values[value].value
         Value(**value_dic).save()
+
+
+def get_type_flow(flow_name):
+
+    if any([
+            i in flow_name
+            for i in [
+                'consejo', 'mosquitos', 'development', 'lineaMaterna', 'milk',
+                'nutrition', 'extra', 'labor'
+            ]
+    ]):
+        return 'consejos'
+    elif any([i in flow_name for i in ['reto']]):
+        return 'retos'
+    elif any(
+        [i in flow_name for i in ['reto', 'freePD', 'getBirth', 'miAlerta']]):
+        return 'recordatorios'
+    elif any(
+        [i in flow_name for i in ['planning', 'miAlerta_followUp', 'miAlta']]):
+        return 'planificacion'
+    elif any([i in flow_name for i in ['incentives']]):
+        return 'incentivos'
+    elif any([
+            i in flow_name
+            for i in ['prevent', 'concerns', 'miscarriage', 'prematuro']
+    ]):
+        return 'preocupaciones'
+    else:
+        return 'otros'
 
 
 def update_runs(after=None, last_runs=None):
@@ -159,6 +192,8 @@ def update_runs(after=None, last_runs=None):
             action_dict['time'] = path_item.time
             action_dict['action_uuid'] = action["action_id"]
             action_dict['msg'] = action["msg"]
+            action_dict['type'] = get_type_flow(
+                action_dict.get('flow_name', ''))
             Run(**action_dict).save()
 
 

@@ -44,6 +44,7 @@ services:
         env_file: .env
         volumes:
             - ./unicef_backend:/app
+
         depends_on:
             - redis
             - elasticsearch
