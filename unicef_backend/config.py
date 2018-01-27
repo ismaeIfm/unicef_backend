@@ -12,6 +12,8 @@ class Config(object):
     CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
     CELERY_SEND_TASK_SENT_EVENT = True
 
+    ELASTICSEARCH_HOST = os.getenv('ELASTICSEARCH_HOST')
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
