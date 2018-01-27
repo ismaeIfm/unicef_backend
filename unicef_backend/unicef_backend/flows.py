@@ -104,6 +104,18 @@ def number_sent_msgs_by_flow(filter=[]):
                               'categoria')
 
 
+@decorator('time')
+def number_sent_msgs_by_baby_age(filter=[]):
+    q = search_runs_by_contact_info(child_querys=filter)
+    q = aggregate_by_baby_age(q)
+    q = aggregate_by_run(q, bucket=BYBABYAGE_STR)
+    q = aggregate_by_msg(q, bucket1=BYBABYAGE_STR, bucket2=RUNSCOUNT_STR)
+
+    response = q.execute()
+
+    return response.aggregations.by_baby_age.buckets
+
+
 ##########################################################################
 #                         Mi alerta       (use flow auxiliar methods)    #
 ##########################################################################
