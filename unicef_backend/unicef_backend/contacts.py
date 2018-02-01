@@ -32,7 +32,7 @@ def number_contacts_by_state(filter=[], query=[]):
 
     response = q.execute()
     return format_aggs_result(
-        response.aggregations[BYSTATE_STR].buckets, key='state')
+        response.aggregations[BYSTATE_STR].buckets, key='key')
 
 
 @decorator('created_on')
@@ -43,7 +43,7 @@ def number_contacts_by_mun(state, filter=[], query=[]):
     response = q.execute()
 
     return format_aggs_result(
-        response.aggregations[BYMUN_STR].buckets, key='municipio')
+        response.aggregations[BYMUN_STR].buckets, key='key')
 
 
 def number_contacts_by_mom_age():
@@ -66,7 +66,7 @@ def number_contacts_by_hospital(filter=[], query=[]):
     response = q.execute()
 
     return format_aggs_result(
-        response.aggregations[BYHOSPITAL_STR].buckets, key='hospital')
+        response.aggregations[BYHOSPITAL_STR].buckets, key='key')
 
 
 @decorator('created_on')
@@ -79,7 +79,7 @@ def number_contacts_by_channel(filter=[], query=[]):
 
     channels = {'facebook': facebook_contacts, 'sms': sms_contacts}
 
-    return format_result(channels, key='channel')
+    return format_result(channels, key='key')
 
 
 ##########################################################################
