@@ -47,8 +47,8 @@ def decorator(argument):
         """
 
         def wrapper(*args, **kwargs):
-            start_date = kwargs["start_date"] if "start_date" in kwargs else ""
-            end_date = kwargs["end_date"] if "end_date" in kwargs else ""
+            start_date = kwargs["start_date"] if "start_date" in kwargs and kwargs["start_date"]  else ""
+            end_date = kwargs["end_date"] if "end_date" in kwargs and kwargs["end_date"]  else ""
             filter_date = {}
 
             if start_date:
@@ -65,7 +65,6 @@ def decorator(argument):
                 kwargs["filter"] = [filter_date]
             kwargs.pop('start_date', None)
             kwargs.pop('end_date', None)
-
             return function(*args, **kwargs)
 
         return wrapper

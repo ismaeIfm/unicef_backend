@@ -114,7 +114,6 @@ def number_babies_by_week():
     q = search_contact([Q('term', fields__rp_ispregnant='1')])
     q = aggregate_per_week_pregnant(q)
     response = q.execute()
-
     return response.aggregations[BYWEEKPREGNAT_STR].buckets
 
 
