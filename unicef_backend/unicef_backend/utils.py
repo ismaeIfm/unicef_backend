@@ -123,19 +123,28 @@ def aggregate_by_hospital(q, bucket=None):
 
 def aggregate_by_baby_age(q, bucket=None):
     start_date_pointer = datetime.utcnow()
-    end_date_pointer = datetime.utcnow()
+    #end_date_pointer = datetime.utcnow()
     trimesters = [{
-        "from": start_date_pointer - relativedelta(months=idx * 3),
-        "to": end_date_pointer - relativedelta(months=(idx - 1) * 3)
+        "from":
+        start_date_pointer - relativedelta(months=idx * 3),
+        "to":
+        start_date_pointer - relativedelta(months=(idx - 1) * 3),
+        "key":
+        str(9 - idx)
     } for idx in range(1, 9)]
     if bucket:
         q.aggs[bucket].bucket(
             BYBABYAGE_STR,
-            'range',
+            'date_range',
             field=settings.FIELDS_DELIVERY,
-            ranges=trimesters)
+            ranges=trimesters,
+            keyed=True)
     else:
-        a = A('range', field=settings.FIELDS_DELIVERY, ranges=trimesters)
+        a = A(
+            'date_range',
+            field=settings.FIELDS_DELIVERY,
+            ranges=trimesters,
+            keyed=True)
         q.aggs.bucket(BYBABYAGE_STR, a)
     return q
 
