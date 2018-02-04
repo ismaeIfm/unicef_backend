@@ -152,18 +152,24 @@ def aggregate_by_baby_age(q, bucket=None):
 def aggregate_per_week_pregnant(q, bucket=None):
     weeks = [{
         "from": datetime.now() + timedelta(days=7 * i),
-        "to": datetime.now() + timedelta(days=(i + 1) * 7)
+        "to": datetime.now() + timedelta(days=(i + 1) * 7),
+        "key": str(i + 1)
     } for i in range(1, 40)]
-    weeks.append({"from": datetime.now() + timedelta(days=40 * 7)})
-    weeks.append({"to": datetime.now() + timedelta(days=7)})
+    weeks.append({
+        "from": datetime.now() + timedelta(days=40 * 7),
+        "key": "41"
+    })
+    weeks.append({"to": datetime.now() + timedelta(days=7), "key": "0"})
     if bucket:
         q.aggs[bucket].bucket(
             BYWEEKPREGNAT_STR,
-            'range',
+            'date_range',
             field=settings.FIELDS_DELIVERY,
-            ranges=weeks)
+            ranges=weeks,
+            keyed=True)
     else:
-        a = A('range', field='fields.rp_duedate', ranges=weeks)
+        a = A(
+            'date_range', field='fields.rp_duedate', ranges=weeks, keyed=True)
         q.aggs.bucket(BYWEEKPREGNAT_STR, a)
     return q
 
