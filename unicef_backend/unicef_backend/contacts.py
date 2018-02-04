@@ -161,7 +161,7 @@ def number_hostpital_by_state(filter=[]):
     response = q.execute()
 
     return format_aggs_aggs_result(
-        response.aggregations[BYSTATE_STR].buckets,
+        response,
         key_1='state',
         bucket_1=BYSTATE_STR,
         key_2='hospital',
