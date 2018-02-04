@@ -47,8 +47,10 @@ def decorator(argument):
         """
 
         def wrapper(*args, **kwargs):
-            start_date = kwargs["start_date"] if "start_date" in kwargs and kwargs["start_date"]  else ""
-            end_date = kwargs["end_date"] if "end_date" in kwargs and kwargs["end_date"]  else ""
+            start_date = kwargs[
+                "start_date"] if "start_date" in kwargs and kwargs["start_date"] else ""
+            end_date = kwargs[
+                "end_date"] if "end_date" in kwargs and kwargs["end_date"] else ""
             filter_date = {}
 
             if start_date:
@@ -197,7 +199,7 @@ def format_result(result, key):
 
 def format_aggs_aggs_result(result, key_1, bucket_1, key_2, bucket_2):
     return [{
-        key_q:
+        key_1:
         i['key'],
         'result': [{
             key_2: j['key'],
