@@ -21,12 +21,14 @@ mun_args.update(date_args)
 
 
 def configure_deliverydate(start_date=None, end_date=None):
-    start_date = start_date - relativedelta(years=2)
+    if start_date:
+        start_date = start_date - relativedelta(years=2)
     return start_date, end_date
 
 
 def configure_duedate(start_date=None, end_date=None):
-    end_date = end_date + relativedelta(months=9)
+    if start_date:
+        end_date = end_date + relativedelta(months=9)
     return start_date, end_date
 
 
@@ -239,6 +241,78 @@ def view_channel_by_state(start_date, end_date):
 
 
 ##################      Municipios part     ######################
+@api.route("/pregnants_by_mun", methods=['POST', 'GET'])
+@use_kwargs(mun_args)
+def view_pregnants_by_mun(state,start_date, end_date):
+    """
+    filter by duedate date
+    """
+    start_date, end_date = configure_duedate(start_date, end_date)
+    response = contacts.number_pregnant_by_mun(state,
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/moms_by_mun", methods=['POST', 'GET'])
+@use_kwargs(mun_args)
+def view_moms_by_mun(state,start_date, end_date):
+    """
+    filter by duedate date
+    """
+    start_date, end_date = configure_duedate(start_date, end_date)
+    response = contacts.number_moms_by_mun(state,
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/personal_by_mun", methods=['POST', 'GET'])
+@use_kwargs(mun_args)
+def view_personal_by_mun(state,start_date, end_date):
+    """
+    filter by created_on date
+    """
+    response = contacts.number_personal_by_mun(state,
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/mom_age_by_mun", methods=['POST', 'GET'])
+@use_kwargs(mun_args)
+def view_mom_age_by_mun(state,start_date, end_date):
+    """ """
+    response = contacts.number_baby_age_by_mun(state,
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/baby_age_by_mun", methods=['POST', 'GET'])
+def view_baby_age_by_mun():
+    """ """
+    response = contacts.number_baby_age_by_state()
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/hospitals_by_mun", methods=['POST', 'GET'])
+@use_kwargs(mun_args)
+def view_hospitals_by_mun(state,start_date, end_date):
+    """
+    filter by created_on date
+    """
+    response = contacts.number_hostpital_by_mun(state,
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/channel_by_mun", methods=['POST', 'GET'])
+@use_kwargs(mun_args)
+def view_channel_by_mun(state,start_date, end_date):
+    """
+    filter by created_on date
+    """
+    response = contacts.number_channel_by_mun(state,
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
 """
 curl -X POST \
   http://localhost:5000/users_by_mun \
@@ -247,5 +321,3 @@ curl -X POST \
   -H 'Postman-Token: 5b2faa43-1c46-5047-e6f7-13a0fa99279d' \
   -d '{"state": "29", "start_date": "2017-8-20T00:00:00"}'
  """
-
-# Anadir consideraciones en fechas dependiendo del campo

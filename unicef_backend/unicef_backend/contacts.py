@@ -193,13 +193,13 @@ def number_channel_by_state(filter=[]):
 ##########################################################################
 #                         Municipios part                               #
 ##########################################################################
-#@decorator
+@decorator('rp_duedate')
 def number_pregnant_by_mun(state, filter=[]):
     return number_contacts_by_mun(
         state, query=filter + [Q('term', fields__rp_ispregnant='1')])
 
 
-@decorator('created_on')
+@decorator('rp_duedate')
 def number_moms_by_mun(state, filter=[]):
     return number_contacts_by_mun(
         state, query=filter + [Q('term', fields__rp_ispregnant='0')])
