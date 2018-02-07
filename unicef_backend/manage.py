@@ -57,6 +57,8 @@ def search_contact(uuid):
         contacts = mx_client.get_contacts(uuid=uuid).all()
         if contacts:
             contact = insert_one_contact(contacts[0])
+        else:
+            return ""
     return contact
 
 
@@ -131,6 +133,39 @@ def update_runs(after=None, last_runs=None):
                 continue
             insert_run(run, path_item, action)
 
+
+def load_runs_from_csv(force = False):
+    import csv
+    import ast
+    path = None
+    with open('runs.csv') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter='|')
+        for row in  reader:
+            flow_uuid = row["flow_uuid"].strip()
+            flow_name = row["flow_name"].strip() if row["flow_name"] else ""
+            contact_uuid = row["contact_uuid"].strip() if row["contact_uuid"] else ""
+            if not row["path"]:
+                continue
+            path = row["path"].strip().replace("null",'"null"')
+            search_contact(contact_uuid)
+            for path_item in ast.literal_eval(path):
+                try:
+                    action = Action.get(id=path_item["node_uuid"])  # Search action
+                except NotFoundError:
+                    #We ignore the path item if has a split or a group action
+                    continue
+                run_dict = {
+                    'flow_uuid': flow_uuid,
+                    'flow_name': flow_name,
+                    'contact_uuid': contact_uuid,
+                    'type': get_type_flow(flow_name),
+                    'action_uuid': action['action_id'],
+                    'time': path_item["arrived_on"],
+                    'msg': action['msg'],
+                }
+                r = Run(**run_dict)
+                r.meta.parent = run.contact.uuid
+                r.save()
 
 @manager.command
 def load_flows(force=False):
