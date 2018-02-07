@@ -1,11 +1,11 @@
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
+from dateutil.relativedelta import relativedelta
 from flask import Blueprint, jsonify, make_response
-from webargs import fields
-from webargs.flaskparser import use_kwargs
 
 from unicef_backend import contacts
+from webargs import fields
+from webargs.flaskparser import use_kwargs
 
 api = Blueprint('api', __name__)
 #############################################################
@@ -19,13 +19,16 @@ date_args = {
 mun_args = {'state': fields.Integer(required=True)}
 mun_args.update(date_args)
 
+
 def configure_deliverydate(start_date=None, end_date=None):
-    start_date = start_date-relativedelta(years=2)
+    start_date = start_date - relativedelta(years=2)
     return start_date, end_date
 
+
 def configure_duedate(start_date=None, end_date=None):
-    end_date = end_date+relativedelta(months=9)
-    return start_date, end_date 
+    end_date = end_date + relativedelta(months=9)
+    return start_date, end_date
+
 
 #############################################################
 #                      Endpoints                            #
@@ -42,6 +45,9 @@ def view_user_by_type():
 @api.route("/users_by_state", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_users_by_state(start_date, end_date):
+    """
+    filter by created_on date
+    """
     response = contacts.number_contacts_by_state(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -50,6 +56,9 @@ def view_users_by_state(start_date, end_date):
 @api.route("/users_by_mun", methods=['POST', 'GET'])
 @use_kwargs(mun_args)
 def view_users_by_mun(state, start_date, end_date):
+    """
+    filter by created_on date
+    """
     response = contacts.number_contacts_by_mun(
         state, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -58,6 +67,7 @@ def view_users_by_mun(state, start_date, end_date):
 @api.route("/users_by_mom_age", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_users_by_mom_age(start_date, end_date):
+    """ """
     response = contacts.number_contacts_by_mom_age(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -66,6 +76,7 @@ def view_users_by_mom_age(start_date, end_date):
 @api.route("/users_by_baby_age", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_users_by_baby_age(start_date, end_date):
+    """ """
     response = {}
     lista = contacts.number_contacts_by_baby_age(
         start_date=start_date, end_date=end_date)
@@ -81,6 +92,9 @@ def view_users_by_baby_age(start_date, end_date):
 @api.route("/users_by_hospital", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_users_by_hospital(start_date, end_date):
+    """
+    filter by created_on date
+    """
     response = contacts.number_contacts_by_hospital(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -89,6 +103,9 @@ def view_users_by_hospital(start_date, end_date):
 @api.route("/users_by_channel", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_users_by_channel(start_date, end_date):
+    """
+    filter by created_on date
+    """
     response = contacts.number_contacts_by_channel(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -98,6 +115,10 @@ def view_users_by_channel(start_date, end_date):
 @api.route("/babies_by_state", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_babies_by_state(start_date, end_date):
+    """
+    filter by deliverydate date
+    """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_babies_by_state(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -106,14 +127,26 @@ def view_babies_by_state(start_date, end_date):
 @api.route("/babies_by_mun", methods=['POST', 'GET'])
 @use_kwargs(mun_args)
 def view_babies_by_mun(state, start_date, end_date):
+    """
+    filter by deliverydate date
+    """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_babies_by_mun(
         state, start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/babies_by_week", methods=['POST', 'GET'])
+def view_babies_by_week():
+    """ """
+    response = contacts.number_babies_by_week()
     return make_response(jsonify({'response': response}), 200)
 
 
 @api.route("/babies_by_mom_age", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_babies_by_mom_age(start_date, end_date):
+    """ """
     response = contacts.number_babies_by_mom_age(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -122,14 +155,12 @@ def view_babies_by_mom_age(start_date, end_date):
 @api.route("/babies_by_hospital", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_babies_by_hospital(start_date, end_date):
+    """
+    filter by deliverydate date
+    """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_babies_by_hospital(
         start_date=start_date, end_date=end_date)
-    return make_response(jsonify({'response': response}), 200)
-
-
-@api.route("/babies_by_week", methods=['POST', 'GET'])
-def view_babies_by_week():
-    response = contacts.number_babies_by_week()
     return make_response(jsonify({'response': response}), 200)
 
 
@@ -137,6 +168,10 @@ def view_babies_by_week():
 @api.route("/pregnants_by_state", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_pregnants_by_state(start_date, end_date):
+    """
+    filter by duedate date
+    """
+    start_date, end_date = configure_duedate(start_date, end_date)
     response = contacts.number_pregnant_by_state(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -145,6 +180,10 @@ def view_pregnants_by_state(start_date, end_date):
 @api.route("/moms_by_state", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_moms_by_state(start_date, end_date):
+    """
+    filter by duedate date
+    """
+    start_date, end_date = configure_duedate(start_date, end_date)
     response = contacts.number_moms_by_state(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -153,6 +192,9 @@ def view_moms_by_state(start_date, end_date):
 @api.route("/personal_by_state", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_personal_by_state(start_date, end_date):
+    """
+    filter by created_on date
+    """
     response = contacts.number_personal_by_state(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -161,30 +203,36 @@ def view_personal_by_state(start_date, end_date):
 @api.route("/mom_age_by_state", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_mom_age_by_state(start_date, end_date):
+    """ """
     response = contacts.number_moms_by_state_age(
-        start_date=start_date, end_date=end_date)
-    return make_response(jsonify({'response': response}), 200)
-
-
-@api.route("/hospitals_by_state", methods=['POST', 'GET'])
-@use_kwargs(date_args)
-def view_hospitals_by_state(start_date, end_date):
-    response = contacts.number_hostpital_by_state(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
 @api.route("/baby_age_by_state", methods=['POST', 'GET'])
 def view_baby_age_by_state():
+    """ """
     response = contacts.number_baby_age_by_state()
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/hospitals_by_state", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_hospitals_by_state(start_date, end_date):
+    """
+    filter by created_on date
+    """
+    response = contacts.number_hostpital_by_state(
+        start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
 @api.route("/channel_by_state", methods=['POST', 'GET'])
 @use_kwargs(date_args)
 def view_channel_by_state(start_date, end_date):
-    print(start_date)
-    print(end_date)
+    """
+    filter by created_on date
+    """
     response = contacts.number_channel_by_state(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
