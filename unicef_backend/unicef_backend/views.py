@@ -1,4 +1,5 @@
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 from flask import Blueprint, jsonify, make_response
 from webargs import fields
@@ -17,6 +18,14 @@ date_args = {
 
 mun_args = {'state': fields.Integer(required=True)}
 mun_args.update(date_args)
+
+def configure_deliverydate(start_date=None, end_date=None):
+    start_date = start_date-relativedelta(years=2)
+    return start_date, end_date
+
+def configure_duedate(start_date=None, end_date=None):
+    end_date = end_date+relativedelta(months=9)
+    return start_date, end_date 
 
 #############################################################
 #                      Endpoints                            #
@@ -188,7 +197,7 @@ curl -X POST \
   -H 'Cache-Control: no-cache' \
   -H 'Content-Type: application/json' \
   -H 'Postman-Token: 5b2faa43-1c46-5047-e6f7-13a0fa99279d' \
-  -d '{"state": "29"}'
+  -d '{"state": "29", "start_date": "2017-8-20T00:00:00"}'
  """
 
 # Anadir consideraciones en fechas dependiendo del campo
