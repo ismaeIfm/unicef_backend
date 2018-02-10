@@ -1,8 +1,9 @@
 from elasticsearch_dsl import Q
-
-import unicef_backend.settings as settings
-from unicef_backend.indexes import Value
-from unicef_backend.utils import *
+import sys
+sys.path.insert(0, '..')
+import settings
+from indexes import Value
+from rapidpro_proxy.utils import *
 
 ####################### Auxiliar functions ##################
 

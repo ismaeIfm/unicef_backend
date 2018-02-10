@@ -45,21 +45,24 @@ class Contact(DocType):
     urns = Text(multi=True, fields={'raw': Keyword()})
     created_on = Date()
     groups = Object(
-        multi=True, properties={"name": Keyword(),
-                                "uuid": Keyword()})
+        multi=True, properties={
+            "name": Keyword(),
+            "uuid": Keyword()
+        })
     modified_on = Date()
     uuid = Keyword()
     name = Keyword()
     language = Keyword()
-    fields = Object(properties={
-        'rp_deliverydate': Date(),
-        'rp_state_number': Keyword(),
-        'rp_ispregnant': Keyword(),
-        'rp_mun': Keyword(),
-        'rp_atenmed': Keyword(),
-        'rp_Mamafechanac': Date(),
-        'rp_duedate': Date()
-    })
+    fields = Object(
+        properties={
+            'rp_deliverydate': Date(),
+            'rp_state_number': Keyword(),
+            'rp_ispregnant': Keyword(),
+            'rp_mun': Keyword(),
+            'rp_atenmed': Keyword(),
+            'rp_Mamafechanac': Date(),
+            'rp_duedate': Date()
+        })
     stopped = Boolean()
     blocked = Boolean()
 

@@ -1,7 +1,7 @@
 from celery import Celery
-#from celery.schedules import crontab
-from unicef_backend import create_app
-from unicef_backend.tasks import download_task  # log, reverse_messages
+import sys
+from flask_backend import create_app
+from tasks import download_task
 
 
 def create_celery(app):
@@ -29,14 +29,4 @@ celery = create_celery(flask_app)
 
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    # Calls reverse_messages every 10 seconds.
-    sender.add_periodic_task(timedelta(minutes=30), download_task)
-
-    # Calls log('Logging Stuff') every 30 seconds
-    #sender.add_periodic_task(
-    #    30.0, log.s(('Logging Stuff')), name='Log every 30')
-
-    # Executes every Monday morning at 7:30 a.m.
-    #sender.add_periodic_task(
-    #    crontab(hour=7, minute=30, day_of_week=1),
-    #    log.s('Monday morning log!'), )
+    sender.add_periodic_task(30.0, download_task)

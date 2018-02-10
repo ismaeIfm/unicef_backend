@@ -1,7 +1,8 @@
 from elasticsearch_dsl import Q
-
-import unicef_backend.settings as settings
-from unicef_backend.utils import *
+import sys
+from rapidpro_proxy.utils import *
+sys.path.insert(0, '..')
+import settings as settings
 
 
 def number_contacts_by_group(filter=[]):
@@ -37,8 +38,8 @@ def number_contacts_by_state(filter=[], query=[]):
 
 @decorator('created_on')
 def number_contacts_by_mun(state, filter=[], query=[]):
-    q = search_contact(query + filter +
-                       [Q('term', fields__rp_state_number=state)])
+    q = search_contact(
+        query + filter + [Q('term', fields__rp_state_number=state)])
     q = aggregate_by_mun(q)
     response = q.execute()
 
@@ -122,20 +123,20 @@ def number_babies_by_week():
 ##########################################################################
 @decorator('rp_duedate')
 def number_pregnant_by_state(filter=[]):
-    return number_contacts_by_state(filter +
-                                    [Q('term', fields__rp_ispregnant='1')])
+    return number_contacts_by_state(
+        filter + [Q('term', fields__rp_ispregnant='1')])
 
 
 @decorator('rp_duedate')
 def number_moms_by_state(filter=[]):
-    return number_contacts_by_state(filter +
-                                    [Q('term', fields__rp_ispregnant='0')])
+    return number_contacts_by_state(
+        filter + [Q('term', fields__rp_ispregnant='0')])
 
 
 @decorator('created_on')
 def number_personal_by_state(filter=[]):
-    return number_contacts_by_state(filter +
-                                    [Q('term', groups__name='PERSONAL_SALUD')])
+    return number_contacts_by_state(
+        filter + [Q('term', groups__name='PERSONAL_SALUD')])
 
 
 def number_moms_by_state_age():
@@ -256,10 +257,10 @@ def number_channel_by_mun(state, filter=[]):
         for i in response.aggregations[BYMUN_STR].buckets
     }
 
-    q = search_contact(filter + [
-        Q('term', fields__rp_state_number=state),
-        Q('match', urns='tel')
-    ])
+    q = search_contact(
+        filter +
+        [Q('term', fields__rp_state_number=state),
+         Q('match', urns='tel')])
     q = aggregate_by_mun(q)
     response = q.execute()
     result['sms'] = {

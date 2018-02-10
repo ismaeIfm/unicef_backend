@@ -10,9 +10,10 @@ from flask_script import Manager
 from temba_client.v2 import TembaClient
 from tqdm import tqdm
 
-from unicef_backend import create_app, settings
-from unicef_backend.indexes import Action, Contact, Run, Value
-from unicef_backend.utils import _format_date, _format_str
+from flask_backend import create_app
+import settings
+from rapidpro_proxy.indexes import Action, Contact, Run, Value
+from rapidpro_proxy.utils import _format_date, _format_str
 
 app = create_app('development')
 mx_client = TembaClient('rapidpro.datos.gob.mx', os.getenv('TOKEN_MX'))
@@ -134,23 +135,25 @@ def update_runs(after=None, last_runs=None):
             insert_run(run, path_item, action)
 
 
-def load_runs_from_csv(force = False):
+def load_runs_from_csv(force=False):
     import csv
     import ast
     path = None
     with open('runs.csv') as csvfile:
         reader = csv.DictReader(csvfile, delimiter='|')
-        for row in  reader:
+        for row in reader:
             flow_uuid = row["flow_uuid"].strip()
             flow_name = row["flow_name"].strip() if row["flow_name"] else ""
-            contact_uuid = row["contact_uuid"].strip() if row["contact_uuid"] else ""
+            contact_uuid = row["contact_uuid"].strip() if row[
+                "contact_uuid"] else ""
             if not row["path"]:
                 continue
-            path = row["path"].strip().replace("null",'"null"')
+            path = row["path"].strip().replace("null", '"null"')
             search_contact(contact_uuid)
             for path_item in ast.literal_eval(path):
                 try:
-                    action = Action.get(id=path_item["node_uuid"])  # Search action
+                    action = Action.get(
+                        id=path_item["node_uuid"])  # Search action
                 except NotFoundError:
                     #We ignore the path item if has a split or a group action
                     continue
@@ -166,6 +169,7 @@ def load_runs_from_csv(force = False):
                 r = Run(**run_dict)
                 r.meta.parent = run.contact.uuid
                 r.save()
+
 
 @manager.command
 def load_flows(force=False):

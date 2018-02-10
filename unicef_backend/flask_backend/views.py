@@ -2,10 +2,10 @@ from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from flask import Blueprint, jsonify, make_response
-
-from unicef_backend import contacts
 from webargs import fields
 from webargs.flaskparser import use_kwargs
+
+from rapidpro_proxy import contacts
 
 api = Blueprint('api', __name__)
 #############################################################
