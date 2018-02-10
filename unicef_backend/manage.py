@@ -185,7 +185,7 @@ def load_flows(force=False):
 
 @manager.command
 def download_contacts(force=False):
-    date = (datetime.utcnow() - timedelta(days=30)).isoformat()
+    date = (datetime.utcnow() - timedelta(minutes=30)).isoformat()
     contacts = mx_client.get_contacts(after=date).all()
     for c in tqdm(contacts, desc='==> Getting Contacts'):
         #Only save misalud contacts

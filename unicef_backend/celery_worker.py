@@ -29,4 +29,4 @@ celery = create_celery(flask_app)
 
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(30.0, download_task)
+    sender.add_periodic_task(1800.0, download_task)
