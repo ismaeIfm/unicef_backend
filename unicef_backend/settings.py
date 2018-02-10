@@ -2,8 +2,8 @@ import os
 
 ################### Redis host configuration ##########################
 CELERY_TIMEZONE = 'America/Mexico_City'
-BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+BROKER_URL =  os.getenv('BROKER_URL')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
 
 ################## Elasticsearch configuration ########################
 INDEX = 'dashboard'
