@@ -64,6 +64,8 @@ def decorator(argument):
                 if argument == "rp_deliverydate":
                     filter_date = Q(
                         'range', fields__rp_deliverydate=filter_date)
+                elif argument == "time":
+                    filter_date = Q('range', time=filter_date)
                 else:
                     filter_date = Q('range', created_on=filter_date)
 
