@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, make_response
 from webargs import fields
 from webargs.flaskparser import use_kwargs
 
-from rapidpro_proxy import contacts
+from rapidpro_proxy import contacts, flows
 
 api = Blueprint('api', __name__)
 #############################################################
@@ -324,7 +324,129 @@ def view_channel_by_mun(state, start_date, end_date):
     """
     response = contacts.number_channel_by_mun(
         state, start_date=start_date, end_date=end_date)
-    print(response)
+    return make_response(jsonify({'response': response}), 200)
+
+
+##################      Mialerta part     ######################
+@api.route("/mialerta_by_group", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_mialerta_by_group(start_date, end_date):
+    """
+    filter by time date
+    """
+    response = flows.number_mialerta_by_group(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/mialerta_by_state", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_mialerta_by_state(start_date, end_date):
+    """
+    filter by time date
+    """
+    response = flows.number_mialerta_by_state(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/mialerta_by_mun", methods=['POST', 'GET'])
+@use_kwargs(mun_args)
+def view_mialerta_by_mun(state, start_date, end_date):
+    """
+    filter by time date
+    """
+    response = flows.number_mialerta_by_mun(
+        state, start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/mialerta_by_hospital", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_mialerta_by_hospital(start_date, end_date):
+    """
+    filter by time date
+    """
+    response = flows.number_mialerta_by_hospital(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/mialerta_by_channel", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_mialerta_by_channel(start_date, end_date):
+    """
+    filter by time date
+    """
+    response = flows.number_mialerta_by_channel(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/mialerta_msgs", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_mialerta_msgs(start_date, end_date):
+    """
+    filter by time date
+    """
+    response = flows.number_mialerta_msgs_top(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+##################      cancela part     ######################
+@api.route("/cancela_by_group", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_cancela_by_group(start_date, end_date):
+    """
+    filter by time date
+    """
+    response = flows.number_cancel_by_group(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/cancela_by_state", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_cancela_by_state(start_date, end_date):
+    """
+    filter by time date
+    """
+    response = flows.number_cancel_by_state(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/cancela_by_mun", methods=['POST', 'GET'])
+@use_kwargs(mun_args)
+def view_cancela_by_mun(state, start_date, end_date):
+    """
+    filter by time date
+    """
+    response = flows.number_cancel_by_mun(
+        state, start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/cancela_by_hospital", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_cancela_by_hospital(start_date, end_date):
+    """
+    filter by time date
+    """
+    response = flows.number_cancel_by_hospital(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/cancela_by_channel", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_cancela_by_channel(start_date, end_date):
+    """
+    filter by time date
+    """
+    response = flows.number_cancel_by_channel(
+        start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
