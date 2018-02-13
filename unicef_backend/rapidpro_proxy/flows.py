@@ -2,7 +2,7 @@ from elasticsearch_dsl import Q
 import sys
 sys.path.insert(0, '..')
 import settings
-from indexes import Value
+from rapidpro_proxy.indexes import Value
 from rapidpro_proxy.utils import *
 
 ####################### Auxiliar functions ##################
@@ -130,13 +130,13 @@ def aux_mialerta(parent_querys=[], child_querys=[]):
 
 
 @decorator("time")
-def number_cancel_by_group(filter=[]):
+def number_mialerta_by_group(filter=[]):
     result = {}
     aux_query = lambda query: aggregate_by_value(search_values_by_contact_info(
         parent_querys=[query],
         child_querys=[
-            Q('term', flow_uuid=settings.CANCEL_FLOW),
-            Q('term', node=settings.CANCEL_NODE)
+            Q('term', flow_uuid=settings.MIALERTA_FLOW),
+            Q('term', node=settings.MIALERTA_NODE)
         ] + filter)).execute().aggregations[VALUESCOUNT_STR].doc_count
 
     result['baby'] = aux_query(Q('term', fields__rp_ispregnant='1'))
