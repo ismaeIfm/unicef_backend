@@ -4,16 +4,18 @@ import re
 from datetime import datetime, timedelta
 
 from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch_dsl import Index
 from flask_script import Manager
 from temba_client.v2 import TembaClient
 from tqdm import tqdm
 
-from flask_backend import create_app
 import settings
-from rapidpro_proxy.indexes import Action, Contact, Run, Value
-from rapidpro_proxy.utils import _format_date, _format_str
+from flask_backend import create_app
+from rapidpro_proxy.indexes import Action, Contact, Run
+from rapidpro_proxy.utils import (_format_date, _format_str,
+                                  _get_difference_dates)
 
 app = create_app('development')
 mx_client = TembaClient('rapidpro.datos.gob.mx', os.getenv('TOKEN_MX'))
@@ -71,24 +73,6 @@ def search_contact(uuid):
     return contact
 
 
-def insert_value_run(run):
-    for value in run.values:
-
-        value_dict = {
-            'flow_uuid': run.flow.uuid,
-            'flow_name': run.flow.name,
-            'contact_uuid': run.contact.uuid,
-            'node': value,
-            'category': run.values[value].category,
-            'time': run.values[value].time,
-            'response': run.values[value].value
-        }
-
-        v = Value(**value_dict)
-        v.meta.parent = run.contact.uuid
-        v.save()
-
-
 def get_type_flow(flow_name):
     aux_flow = lambda fs: any([i in flow_name for i in fs])
     if aux_flow(settings.CONSEJOS_FLOWS):
@@ -107,7 +91,13 @@ def get_type_flow(flow_name):
         return 'otros'
 
 
-def insert_run(run, path_item, action):
+def insert_run(run, path_item, action, c):
+    contact_age = _get_difference_dates(path_item.time,
+                                        c.fields.rp_Mamafechanac, 'y')
+    baby_age = _get_difference_dates(path_item.time, c.fields.rp_deliverydate,
+                                     'm')
+    week_pregnant = _get_difference_dates(c.fields.rp_duedate, path_item.time,
+                                          'w')
 
     run_dict = {
         'flow_uuid': run.flow.uuid,
@@ -119,7 +109,15 @@ def insert_run(run, path_item, action):
         'msg': action['msg'],
         'responded': run.responded,
         'exit_type': run.exit_type,
-        'is_one_way': False if run.values else True
+        'is_one_way': False if run.values else True,
+        'fields': {
+            'rp_ispregnant': _format_str(c.fields.rp_ispregnant),
+            'rp_mun': _format_str(c.fields.rp_mun),
+            'rp_atenmed': _format_str(c.fields.rp_atenmed),
+            'contact_age': contact_age,
+            'baby_age': baby_age,
+            'week_pregnant': 40 - week_pregnant if week_pregnant else None
+        }
     }
 
     r = Run(**run_dict)
@@ -132,18 +130,21 @@ def update_runs(after=None, last_runs=None):
         last_runs = mx_client.get_runs(after=after).all(
             retry_on_rate_exceed=True)
     for run in last_runs:
-        search_contact(run.contact.uuid)
+        c = search_contact(run.contact.uuid)
+        print(type(c))
         if run.flow.uuid == settings.MIALERTA_FLOW:  #MiAlerta
-            insert_value_run(run)
+            pass
+            #insert_value_run(run) TODO
         elif run.flow.uuid == settings.CANCEL_FLOW:  #Cancela
-            insert_value_run(run)
+            pass
+            #insert_value_run(run) TODO
         for path_item in run.path:
             try:
                 action = Action.get(id=path_item.node)  # Search action
             except NotFoundError:
                 #We ignore the path item if has a split or a group action
                 continue
-            insert_run(run, path_item, action)
+            insert_run(run, path_item, action, c)
 
 
 def load_runs_from_csv(force=False):
@@ -215,7 +216,7 @@ def delete_index(force=False):
 def create_index():
     index = Index(settings.INDEX)
     index.delete(ignore=404)
-    for t in [Action, Contact, Run, Value]:
+    for t in [Action, Contact, Run]:
         index.doc_type(t)
     index.create()
 
