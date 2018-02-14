@@ -1,5 +1,15 @@
-INDEX = 'dashboard'
+import os
 
+################### Redis host configuration ##########################
+CELERY_TIMEZONE = 'America/Mexico_City'
+BROKER_URL =  os.getenv('BROKER_URL')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
+
+################## Elasticsearch configuration ########################
+INDEX = 'dashboard'
+ELASTICSEARCH_HOST = os.getenv('ELASTICSEARCH_HOST')
+
+##################### Flows rapidpro constants #########################
 RETOS_FLOWS = ['reto']
 INCENTIVOS_FLOWS = ['incentives']
 RECORDATORIOS_FLOWS = ['freePD', 'getBirth', 'miAlerta']
@@ -15,6 +25,7 @@ MIALERTA_NODE = "response_1"
 CANCEL_FLOW = "dbd5738f-8700-4ece-8b8c-d68b3f4529f7"
 CANCEL_NODE = "response_3"
 
+##################### Contact fields constants #######################
 FIELDS_STATE = "fields.rp_state_number"
 FIELDS_MUN = "fields.rp_mun"
 FIELDS_DELIVERY = "fields.rp_deliverydate"

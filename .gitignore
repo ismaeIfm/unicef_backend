@@ -8,3 +8,5 @@ __pycache__
 preprocess/commands.sh
 preprocess/definitions.json
 data/
+unicef_backend/actions.json
+unicef_backend/runs.csv

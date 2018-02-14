@@ -27,6 +27,8 @@ services:
         volumes:
             - ./unicef_backend:/app
             - ./preprocess/actions.json:/app/actions.json
+            - ./preprocess/runs.csv:/app/runs.csv
+
         ports:
             - "5000:5000"
         depends_on:

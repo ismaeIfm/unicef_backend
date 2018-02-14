@@ -1,12 +1,15 @@
+import sys
 from datetime import date, datetime, timedelta
 
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 from elasticsearch_dsl import A, Q
 
-import unicef_backend.settings as settings
-from unicef_backend.indexes import Contact, Run
+import settings
+from rapidpro_proxy.indexes import Contact, Run
 
+sys.path.insert(0, '..')
+################### Constants of aggregation's names #################
 BYSTATE_STR = 'by_state'
 BYMUN_STR = 'by_mun'
 BYHOSPITAL_STR = 'by_hospital'
@@ -65,6 +68,8 @@ def decorator(argument):
                 if argument == "rp_deliverydate":
                     filter_date = Q(
                         'range', fields__rp_deliverydate=filter_date)
+                elif argument == "time":
+                    filter_date = Q('range', time=filter_date)
                 else:
                     filter_date = Q('range', created_on=filter_date)
 
@@ -90,16 +95,16 @@ def search_run(querys=[]):
 
 # review
 def search_runs_by_contact_info(parent_querys=[], child_querys=[]):
-    return search_contact(parent_querys + [
-        Q('has_child', type='run', query=Q('bool', must=child_querys))
-    ])
+    return search_contact(
+        parent_querys +
+        [Q('has_child', type='run', query=Q('bool', must=child_querys))])
 
 
 # review
 def search_values_by_contact_info(parent_querys=[], child_querys=[]):
-    return search_contact(parent_querys + [
-        Q('has_child', type='value', query=Q('bool', must=child_querys))
-    ])
+    return search_contact(
+        parent_querys +
+        [Q('has_child', type='value', query=Q('bool', must=child_querys))])
 
 
 def aggregate_by_state(q):
