@@ -1,9 +1,11 @@
-from elasticsearch_dsl import Q
 import sys
-sys.path.insert(0, '..')
+
+from elasticsearch_dsl import Q
+
 import settings
-from rapidpro_proxy.indexes import Value
 from rapidpro_proxy.utils import *
+
+sys.path.insert(0, '..')
 
 ####################### Auxiliar functions ##################
 
@@ -173,24 +175,23 @@ def number_mialerta_by_baby_age(filter=[]):
     return _aux_number_by_baby_age(aux_mialerta, filter=filter)
 
 
-@decorator("time")
-def number_mialerta_msgs_top(filter=[]):
-
-    s = Value.search()
-    q = s.query(
-        'bool',
-        must=[
-            Q('term', flow_uuid=settings.MIALERTA_FLOW),
-            Q('term', node=settings.MIALERTA_NODE)
-        ] + filter)
-
-    a = A('terms', field='category', size=2147483647)
-    q.aggs.bucket('per_category', a)
-    response = q.execute()
-
-    return format_aggs_result(response.aggregations.per_category.buckets,
-                              'category')
-
+#@decorator("time")
+#def number_mialerta_msgs_top(filter=[]):
+#
+#    s = Value.search()
+#    q = s.query(
+#        'bool',
+#        must=[
+#            Q('term', flow_uuid=settings.MIALERTA_FLOW),
+#            Q('term', node=settings.MIALERTA_NODE)
+#        ] + filter)
+#
+#    a = A('terms', field='category', size=2147483647)
+#    q.aggs.bucket('per_category', a)
+#    response = q.execute()
+#
+#    return format_aggs_result(response.aggregations.per_category.buckets,
+#                              'category')
 
 ##########################################################################
 #                        Cancel part   (Use flow auxiliar methods)       #
