@@ -13,6 +13,10 @@ BYHOSPITAL_STR = 'by_hospital'
 BYBABYAGE_STR = 'by_baby_age'
 BYWEEKPREGNAT_STR = 'by_week_pregnant'
 BYMSG_STR = 'by_msg'
+BYWAY_STR = 'by_way'
+
+FILTERDATE_STR = 'filter_date'
+FILTERCOMPLETED_STR = 'filter_completed'
 
 RUNSCOUNT_STR = 'runs_count'
 VALUESCOUNT_STR = 'values_count'
@@ -84,12 +88,14 @@ def search_run(querys=[]):
     return s.query('bool', must=querys)
 
 
+# review
 def search_runs_by_contact_info(parent_querys=[], child_querys=[]):
     return search_contact(parent_querys + [
         Q('has_child', type='run', query=Q('bool', must=child_querys))
     ])
 
 
+# review
 def search_values_by_contact_info(parent_querys=[], child_querys=[]):
     return search_contact(parent_querys + [
         Q('has_child', type='value', query=Q('bool', must=child_querys))
@@ -192,8 +198,8 @@ def aggregate_by_value(q, bucket=None):
     return q
 
 
-def aggregate_by_msg(q, bucket1, bucket2):
-    q.aggs[bucket1].aggs[bucket2].bucket(
+def aggregate_by_msg(q, bucket1, bucket2, bucket3):
+    q.aggs[bucket1].aggs[bucket2].aggs[bucket3].bucket(
         BYMSG_STR, 'terms', field='msg', size=10)
     return q
 
@@ -201,6 +207,29 @@ def aggregate_by_msg(q, bucket1, bucket2):
 def aggregate_by_flow(q):
     a = A('terms', field='type', size=10)
     q.aggs.bucket(BYFLOW_STR, a)
+    return q
+
+
+def aggregate_by_way(q, bucket1, bucket2, bucket3):
+    q.aggs[bucket1].aggs[bucket2].aggs[bucket3].bucket(
+        BYWAY_STR, 'terms', field='is_one_way')
+    return q
+
+
+def filter_completed(q, bucket1, bucket2):
+    q.aggs[bucket1].aggs[bucket2].bucket(
+        FILTERCOMPLETED_STR, 'filter', term={'exit_type': 'completed'})
+    return q
+
+
+def filter_aggregate_by_date(q, bucket1, bucket2=None, range_date={"time":
+                                                                   {}}):
+    if bucket2:
+        q.aggs[bucket1].aggs[bucket2].bucket(
+            FILTERDATE_STR, 'filter', range=range_date)
+    else:
+        q.aggs[bucket1].bucket(FILTERDATE_STR, 'filter', range=range_date)
+
     return q
 
 
@@ -234,8 +263,20 @@ def format_aggs_aggs_result_runs(result, key_1, bucket_1, key_2, bucket_2):
     } for i in result.aggregations[bucket_1].buckets]
 
 
+def format_aggs_aggs_result_runs_date(result, key_1, bucket_1, key_2,
+                                      bucket_2):
+    return [{
+        key_1:
+        i['key'],
+        'result': [{
+            key_2: j['key'],
+            'count': j['doc_count']
+        } for j in i[RUNSCOUNT_STR].filter_date[bucket_2].buckets]
+    } for i in result.aggregations[bucket_1].buckets]
+
+
 def format_aggs_runs(result, key):
     return [{
         key: i['key'],
-        'count': i[RUNSCOUNT_STR]['doc_count']
+        'count': i[RUNSCOUNT_STR].filter_date['doc_count']
     } for i in result]

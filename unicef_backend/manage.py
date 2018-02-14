@@ -25,7 +25,15 @@ CONTACT_FIELDS = {
     'rp_mun': _format_str,
     'rp_atenmed': _format_str,
     'rp_Mamafechanac': _format_date,
-    'rp_duedate': _format_date
+    'rp_duedate': _format_date,
+    'rp_razonalerta': _format_str,
+    'rp_razonbaja': _format_str,
+    'calidad_antropometria': _format_str,
+    'calidad_crecimuterino': _format_str,
+    'calidad_lactancia': _format_str,
+    'calidad_presionarterial': _format_str,
+    'calidad_signosalarma': _format_str,
+    'calidad_vacunas': _format_str
 }
 
 
@@ -106,6 +114,9 @@ def insert_run(run, path_item, action):
         'action_uuid': action['action_id'],
         'time': path_item.time,
         'msg': action['msg'],
+        'responded': run.responded,
+        'exit_type': run.exit_type,
+        'is_one_way': False if run.values else True
     }
 
     r = Run(**run_dict)
@@ -172,7 +183,7 @@ def create_index():
 
 @manager.command
 def download_test_runs(force=False):
-    after = datetime.utcnow() - timedelta(days=1)
+    after = datetime.utcnow() - timedelta(days=2)
     after = after.isoformat()
     update_runs(after)
     print("Descargando alerta")

@@ -8,9 +8,11 @@ from unicef_backend.utils import *
 
 
 def _aux_number_by_state(fun, filter=[]):
-    q = fun(child_querys=filter)
+    q = fun()
     q = aggregate_by_state(q)
     q = aggregate_by_run(q, bucket=BYSTATE_STR)
+    q = filter_aggregate_by_date(
+        q, BYSTATE_STR, RUNSCOUNT_STR, range_date={"time": {}})
     response = q.execute()
 
     return format_aggs_runs(response.aggregations[BYSTATE_STR].buckets,
@@ -19,11 +21,11 @@ def _aux_number_by_state(fun, filter=[]):
 
 def _aux_number_by_mun(state, fun, filter=[]):
 
-    q = fun(
-        child_querys=filter,
-        parent_querys=[Q('term', fields__rp_state_number=state)])
+    q = fun(parent_querys=[Q('term', fields__rp_state_number=state)])
     q = aggregate_by_mun(q)
     q = aggregate_by_run(q, bucket=BYMUN_STR)
+    q = filter_aggregate_by_date(
+        q, BYMUN_STR, RUNSCOUNT_STR, range_date={"time": {}})
     response = q.execute()
 
     return format_aggs_runs(response.aggregations[BYMUN_STR].buckets,
@@ -35,20 +37,26 @@ def _aux_number_by_hospital(fun, filter=[]):
     q = fun(child_querys=filter)
     q = aggregate_by_hospital(q)
     q = aggregate_by_run(q, bucket=BYHOSPITAL_STR)
+    q = filter_aggregate_by_date(
+        q, BYHOSPITAL_STR, RUNSCOUNT_STR, range_date={"time": {}})
     response = q.execute()
 
     return format_aggs_runs(response.aggregations[BYHOSPITAL_STR].buckets,
                             'hospital')
 
 
+def _aux_channel(fun, query):
+    q = aggregate_by_run(fun(parent_querys=[query]))
+    q = filter_aggregate_by_date(q, RUNSCOUNT_STR, range_date={"time": {}})
+    response = q.execute()
+    return response.aggregations[RUNSCOUNT_STR].filter_date.doc_count
+
+
 def _aux_number_by_channel(fun, filter=[]):
-    result = {}
-    aux_query = lambda query : aggregate_by_run(fun(parent_querys=[query], child_querys=filter)).execute().aggregations[RUNSCOUNT_STR].doc_count
-
-    result["fb"] = aux_query(Q('match', urns='facebook'))
-    result["sms"] = aux_query(Q('match', urns='tel'))
-
-    return format_result(result, 'channel')
+    return {
+        q: _aux_channel(fun, Q('match', urns=q))
+        for q in ['facebook', 'tel']
+    }
 
 
 #NAin
@@ -57,6 +65,8 @@ def _aux_number_by_baby_age(fun, filter=[]):
     q = fun(child_querys=filter)
     q = aggregate_by_baby_age(q)
     q = aggregate_by_run(q, bucket=BYBABYAGE_STR)
+    q = filter_aggregate_by_date(
+        q, BYBABYAGE_STR, RUNSCOUNT_STR, range_date={"time": {}})
     response = q.execute()
 
     return response.aggregations.by_baby_age.buckets
@@ -69,30 +79,33 @@ def _aux_number_by_baby_age(fun, filter=[]):
 
 @decorator('time')
 def number_sent_msgs_by_state(filter=[]):
-    q = search_runs_by_contact_info(child_querys=filter)
+    q = search_runs_by_contact_info()
     q = aggregate_by_state(q)
     q = aggregate_by_run(q, BYSTATE_STR)
-    q = aggregate_by_msg(q, BYSTATE_STR, RUNSCOUNT_STR)
+    q = filter_aggregate_by_date(
+        q, BYSTATE_STR, RUNSCOUNT_STR, range_date={"time": {}})
+    q = aggregate_by_msg(q, BYSTATE_STR, RUNSCOUNT_STR, FILTERDATE_STR)
 
     response = q.execute()
 
-    return format_aggs_aggs_result_runs(response, 'state', BYSTATE_STR, 'msg',
-                                        BYMSG_STR)
+    return format_aggs_aggs_result_runs_date(response, 'state', BYSTATE_STR,
+                                             'msg', BYMSG_STR)
 
 
 @decorator('time')
 def number_sent_msgs_by_mun(state, filter=[]):
     q = search_runs_by_contact_info(
-        child_querys=filter,
         parent_querys=[Q('term', fields__rp_state_number=state)])
     q = aggregate_by_mun(q)
     q = aggregate_by_run(q, bucket=BYMUN_STR)
-    q = aggregate_by_msg(q, bucket1=BYMUN_STR, bucket2=RUNSCOUNT_STR)
+    q = filter_aggregate_by_date(
+        q, BYMUN_STR, RUNSCOUNT_STR, range_date={"time": {}})
+    q = aggregate_by_msg(q, BYMUN_STR, RUNSCOUNT_STR, FILTERDATE_STR)
 
     response = q.execute()
 
-    return format_aggs_aggs_result_runs(response, 'municipio', BYMUN_STR,
-                                        'msg', BYMSG_STR)
+    return format_aggs_aggs_result_runs_date(response, 'municipio', BYMUN_STR,
+                                             'msg', BYMSG_STR)
 
 
 @decorator('time')
@@ -106,10 +119,13 @@ def number_sent_msgs_by_flow(filter=[]):
 
 @decorator('time')
 def number_sent_msgs_by_baby_age(filter=[]):
-    q = search_runs_by_contact_info(child_querys=filter)
+    q = search_runs_by_contact_info()
     q = aggregate_by_baby_age(q)
     q = aggregate_by_run(q, bucket=BYBABYAGE_STR)
-    q = aggregate_by_msg(q, bucket1=BYBABYAGE_STR, bucket2=RUNSCOUNT_STR)
+    q = filter_aggregate_by_date(
+        q, BYBABYAGE_STR, RUNSCOUNT_STR, range_date={"time": {}})
+
+    q = aggregate_by_msg(q, BYBABYAGE_STR, RUNSCOUNT_STR, FILTERDATE_STR)
 
     response = q.execute()
 
@@ -121,27 +137,12 @@ def number_sent_msgs_by_baby_age(filter=[]):
 ##########################################################################
 
 
+### This needs review
 def aux_mialerta(parent_querys=[], child_querys=[]):
     return search_runs_by_contact_info(
         parent_querys=parent_querys,
         child_querys=[Q('term', flow_uuid=settings.MIALERTA_FLOW)] +
         child_querys)
-
-
-@decorator("time")
-def number_cancel_by_group(filter=[]):
-    result = {}
-    aux_query = lambda query: aggregate_by_value(search_values_by_contact_info(
-        parent_querys=[query],
-        child_querys=[
-            Q('term', flow_uuid=settings.CANCEL_FLOW),
-            Q('term', node=settings.CANCEL_NODE)
-        ] + filter)).execute().aggregations[VALUESCOUNT_STR].doc_count
-
-    result['baby'] = aux_query(Q('term', fields__rp_ispregnant='1'))
-    result['pregnant'] = aux_query(Q('term', fields__rp_ispregnant='0'))
-    result['personal'] = aux_query(Q('term', groups__name='PERSONAL_SALUD'))
-    return result
 
 
 @decorator('time')
@@ -202,19 +203,28 @@ def aux_cancela(parent_querys=[], child_querys=[]):
         child_querys)
 
 
-@decorator("time")
-def number_cancel_by_group(filter=[]):
-    result = {}
-    aux_query = lambda query: aggregate_by_value(search_values_by_contact_info(
+def _aux_cancel_by_group(query):
+    q = search_values_by_contact_info(
         parent_querys=[query],
         child_querys=[
             Q('term', flow_uuid=settings.CANCEL_FLOW),
             Q('term', node=settings.CANCEL_NODE)
-        ] + filter)).execute().aggregations[VALUESCOUNT_STR].doc_count
+        ])
+    q = aggregate_by_value(q)
+    q = filter_aggregate_by_date(q, VALUESCOUNT_STR, range_date={"time": {}})
+    response = q.execute()
+    return response.aggregations[VALUESCOUNT_STR].filter_date.doc_count
 
-    result['baby'] = aux_query(Q('term', fields__rp_ispregnant='1'))
-    result['pregnant'] = aux_query(Q('term', fields__rp_ispregnant='0'))
-    result['personal'] = aux_query(Q('term', groups__name='PERSONAL_SALUD'))
+
+#cambiar por fields
+@decorator("time")
+def number_cancel_by_group(filter=[]):
+    result = {}
+    result['baby'] = _aux_cancel_by_group(Q('term', fields__rp_ispregnant='1'))
+    result['pregnant'] = _aux_cancel_by_group(
+        Q('term', fields__rp_ispregnant='0'))
+    result['personal'] = _aux_cancel_by_group(
+        Q('term', groups__name='PERSONAL_SALUD'))
     return result
 
 
@@ -242,3 +252,45 @@ def number_cancel_by_channel(filter=[]):
 #@decorator("time")
 def number_cancel_by_baby_age(filter=[]):
     return _aux_number_by_baby_age(aux_cancela, filter=filter)
+
+
+##########################################################################
+#                   Rate completed messages part                         #
+##########################################################################
+
+
+def aux_rate_completed_messages(parent_querys=[], child_querys=[]):
+    total = search_run(child_querys + [
+        Q('has_parent', type='contact', query=Q('bool', must=parent_querys))
+    ]).count()
+
+    q = search_runs_by_contact_info(parent_querys=parent_querys)
+    q = aggregate_by_run(q)
+    q = filter_aggregate_by_date(q, RUNSCOUNT_STR, range_date={"time": {}})
+    q = filter_completed(q, RUNSCOUNT_STR, FILTERDATE_STR)
+    q = aggregate_by_way(q, RUNSCOUNT_STR, FILTERDATE_STR, FILTERCOMPLETED_STR)
+
+    response = q.execute()
+    runs_completed = {
+        i['key']: i['doc_count']
+        for i in response.aggregations.runs_count.filter_date.filter_completed.
+        by_way.buckets
+    }
+
+    return (runs_completed.get(0, 0) /
+            (total - runs_completed.get(1, 0))) * 100
+
+
+# Si no hay personal de salud que pedo?
+
+
+@decorator('time')
+def rate_completed_messages_by_group(filter=[]):
+    result = {}
+    result['baby'] = aux_rate_completed_messages(
+        parent_querys=[Q('term', fields__rp_ispregnant='1')])
+    result['pregnant'] = aux_rate_completed_messages(
+        parent_querys=[Q('term', fields__rp_ispregnant='0')])
+    result['personal'] = aux_rate_completed_messages(
+        parent_querys=[Q('term', groups__name='PERSONAL_SALUD')])
+    return result
