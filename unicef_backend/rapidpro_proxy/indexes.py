@@ -22,24 +22,17 @@ class Run(DocType):
     is_one_way = Boolean()
     responded = Boolean()
     exit_type = Keyword()
+    fields = Object(properties={
+        'rp_ispregnant': Keyword(),
+        'rp_mun': Keyword(),
+        'rp_atenmed': Keyword(),
+        'contact_age': Integer(),
+        'baby_age': Integer(),
+        'week_pregnant': Integer()
+    })
 
     class Meta:
         doc_type = 'run'
-        index = 'dashboard'
-        parent = MetaField(type='contact')
-
-
-class Value(DocType):
-    flow_uuid = Keyword()
-    node = Keyword(multi=True)
-    contact_uuid = Keyword()
-    flow_name = Keyword()
-    response = Keyword()
-    category = Keyword()
-    time = Date()
-
-    class Meta:
-        doc_type = 'value'
         index = 'dashboard'
         parent = MetaField(type='contact')
 
@@ -48,10 +41,8 @@ class Contact(DocType):
     urns = Text(multi=True, fields={'raw': Keyword()})
     created_on = Date()
     groups = Object(
-        multi=True, properties={
-            "name": Keyword(),
-            "uuid": Keyword()
-        })
+        multi=True, properties={"name": Keyword(),
+                                "uuid": Keyword()})
     modified_on = Date()
     uuid = Keyword()
     name = Keyword()
