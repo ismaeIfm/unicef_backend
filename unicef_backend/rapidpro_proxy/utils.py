@@ -47,6 +47,27 @@ def _format_str(item):
     return None
 
 
+def _get_difference_dates(start_date, end_date, element):
+    if not start_date or not end_date:
+        return None
+    else:
+        result = -1
+        if element == 'm':
+            result = relativedelta(
+                end_date.replace(tzinfo=None),
+                start_date.replace(tzinfo=None)).months
+        elif element == 'y':
+            result = relativedelta(
+                end_date.replace(tzinfo=None),
+                start_date.replace(tzinfo=None)).years
+        elif element == 'w':
+            result = relativedelta(
+                end_date.replace(tzinfo=None),
+                start_date.replace(tzinfo=None)).weeks
+
+    return result if result >= 0 else None
+
+
 def decorator(argument):
     def date_decorator(function):
         """ Decorator to change start_date and end_date parameters to
@@ -95,16 +116,16 @@ def search_run(querys=[]):
 
 # review
 def search_runs_by_contact_info(parent_querys=[], child_querys=[]):
-    return search_contact(
-        parent_querys +
-        [Q('has_child', type='run', query=Q('bool', must=child_querys))])
+    return search_contact(parent_querys + [
+        Q('has_child', type='run', query=Q('bool', must=child_querys))
+    ])
 
 
 # review
 def search_values_by_contact_info(parent_querys=[], child_querys=[]):
-    return search_contact(
-        parent_querys +
-        [Q('has_child', type='value', query=Q('bool', must=child_querys))])
+    return search_contact(parent_querys + [
+        Q('has_child', type='value', query=Q('bool', must=child_querys))
+    ])
 
 
 def aggregate_by_state(q):
