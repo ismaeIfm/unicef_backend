@@ -19,6 +19,9 @@ class Run(DocType):
     action_uuid = Keyword()
     time = Date()
     msg = Keyword()
+    is_one_way = Boolean()
+    responded = Boolean()
+    exit_type = Keyword()
 
     class Meta:
         doc_type = 'run'
@@ -53,16 +56,23 @@ class Contact(DocType):
     uuid = Keyword()
     name = Keyword()
     language = Keyword()
-    fields = Object(
-        properties={
-            'rp_deliverydate': Date(),
-            'rp_state_number': Keyword(),
-            'rp_ispregnant': Keyword(),
-            'rp_mun': Keyword(),
-            'rp_atenmed': Keyword(),
-            'rp_Mamafechanac': Date(),
-            'rp_duedate': Date()
-        })
+    fields = Object(properties={
+        'rp_deliverydate': Date(),
+        'rp_state_number': Keyword(),
+        'rp_ispregnant': Keyword(),
+        'rp_mun': Keyword(),
+        'rp_atenmed': Keyword(),
+        'rp_Mamafechanac': Date(),
+        'rp_duedate': Date(),
+        'rp_razonalerta': Keyword(),
+        'rp_razonbaja': Keyword(),
+        'calidad_antropometria': Keyword(),
+        'calidad_crecimuterino': Keyword(),
+        'calidad_lactancia': Keyword(),
+        'calidad_presionarterial': Keyword(),
+        'calidad_signosalarma': Keyword(),
+        'calidad_vacunas': Keyword()
+    })
     stopped = Boolean()
     blocked = Boolean()
 
