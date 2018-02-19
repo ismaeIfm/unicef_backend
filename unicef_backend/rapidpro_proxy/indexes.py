@@ -12,6 +12,7 @@ class Action(DocType):
 
 
 class Run(DocType):
+    urns = Text(multi=True, fields={'raw': Keyword()})
     flow_uuid = Keyword()
     flow_name = Keyword()
     contact_uuid = Keyword()
@@ -24,12 +25,15 @@ class Run(DocType):
     exit_type = Keyword()
     fields = Object(properties={
         'rp_ispregnant': Keyword(),
+        'rp_state_number': Keyword(),
         'rp_mun': Keyword(),
         'rp_atenmed': Keyword(),
-        'contact_age': Integer(),
-        'baby_age': Integer(),
-        'week_pregnant': Integer()
+        'rp_razonalerta': Keyword(),
+        'rp_razonbaja': Keyword(),
+        'contact_age': Integer()
     })
+    baby_age = Integer()
+    pregnant_week = Integer()
 
     class Meta:
         doc_type = 'run'
@@ -53,7 +57,7 @@ class Contact(DocType):
         'rp_ispregnant': Keyword(),
         'rp_mun': Keyword(),
         'rp_atenmed': Keyword(),
-        'rp_Mamafechanac': Date(),
+        'rp_mamafechanac': Date(),
         'rp_duedate': Date(),
         'rp_razonalerta': Keyword(),
         'rp_razonbaja': Keyword(),
@@ -64,9 +68,26 @@ class Contact(DocType):
         'calidad_signosalarma': Keyword(),
         'calidad_vacunas': Keyword()
     })
+    pregnant_week = Integer(multi=True)
+    baby_age = Integer(multi=True)
+
     stopped = Boolean()
     blocked = Boolean()
 
     class Meta:
         doc_type = 'contact'
         index = 'dashboard'
+
+    def update_week(self, week):
+        weeks = self.pregnant_week
+        if week and week not in weeks:
+            weeks.append(week)
+            self.pregnant_week = weeks
+        return self.save()
+
+    def update_baby_age(self, baby_age):
+        trims = self.baby_age
+        if baby_age and baby_age not in trims:
+            trims.append(baby_age)
+            self.baby_age = trims
+        return self.save()

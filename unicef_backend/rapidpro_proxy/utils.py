@@ -14,9 +14,11 @@ BYSTATE_STR = 'by_state'
 BYMUN_STR = 'by_mun'
 BYHOSPITAL_STR = 'by_hospital'
 BYBABYAGE_STR = 'by_baby_age'
+BYMOMAGE_STR = 'by_mom_age'
 BYWEEKPREGNAT_STR = 'by_week_pregnant'
 BYMSG_STR = 'by_msg'
 BYWAY_STR = 'by_way'
+BYCALIDAD_STR = 'by_calidad'
 
 FILTERDATE_STR = 'filter_date'
 FILTERCOMPLETED_STR = 'filter_completed'
@@ -25,6 +27,7 @@ RUNSCOUNT_STR = 'runs_count'
 VALUESCOUNT_STR = 'values_count'
 
 BYFLOW_STR = 'by_flow'
+BYRAZON = 'by_razon'
 
 ####################### Auxiliar functions ##################
 
@@ -68,8 +71,8 @@ def _get_difference_dates(start_date, end_date, element):
     return result if result >= 0 else None
 
 
-def decorator(argument):
-    def date_decorator(function):
+def date_decorator(argument):
+    def decorator_wrapper(function):
         """ Decorator to change start_date and end_date parameters to
             query dictionary
         """
@@ -94,14 +97,14 @@ def decorator(argument):
                 else:
                     filter_date = Q('range', created_on=filter_date)
 
-                kwargs["filter"] = [filter_date]
+                kwargs["filter_date"] = [filter_date]
             kwargs.pop('start_date', None)
             kwargs.pop('end_date', None)
             return function(*args, **kwargs)
 
         return wrapper
 
-    return date_decorator
+    return decorator_wrapper
 
 
 def search_contact(querys=[]):
@@ -114,149 +117,115 @@ def search_run(querys=[]):
     return s.query('bool', must=querys)
 
 
-# review
-def search_runs_by_contact_info(parent_querys=[], child_querys=[]):
-    return search_contact(parent_querys + [
-        Q('has_child', type='run', query=Q('bool', must=child_querys))
-    ])
-
-
-# review
-def search_values_by_contact_info(parent_querys=[], child_querys=[]):
-    return search_contact(parent_querys + [
-        Q('has_child', type='value', query=Q('bool', must=child_querys))
-    ])
-
-
 def aggregate_by_state(q):
     a = A('terms', field=settings.FIELDS_STATE, size=2147483647)
     q.aggs.bucket(BYSTATE_STR, a)
-    return q
 
 
 def aggregate_by_mun(q):
     a = A('terms', field=settings.FIELDS_MUN, size=2147483647)
     q.aggs.bucket(BYMUN_STR, a)
-    return q
 
 
-def aggregate_by_hospital(q, bucket=None):
-    if bucket:
-        q.aggs[bucket].bucket(
+def aggregate_by_hospital(q, single=True):
+    if single:
+        a = A('terms', field='fields.rp_atenmed', size=2147483647)
+        q.aggs.bucket(BYHOSPITAL_STR, a)
+    else:
+
+        q.bucket(
             BYHOSPITAL_STR,
             'terms',
             field='fields.rp_atenmed',
             size=2147483647)
-    else:
-        a = A('terms', field='fields.rp_atenmed', size=2147483647)
-        q.aggs.bucket(BYHOSPITAL_STR, a)
-    return q
 
 
-def aggregate_by_baby_age(q, bucket=None):
-    start_date_pointer = datetime.utcnow()
-    #end_date_pointer = datetime.utcnow()
-    trimesters = [{
-        "from":
-        start_date_pointer - relativedelta(months=idx * 3),
-        "to":
-        start_date_pointer - relativedelta(months=(idx - 1) * 3),
-        "key":
-        str(9 - idx)
-    } for idx in range(1, 9)]
-    if bucket:
-        q.aggs[bucket].bucket(
-            BYBABYAGE_STR,
-            'date_range',
-            field=settings.FIELDS_DELIVERY,
-            ranges=trimesters,
-            keyed=True)
-    else:
+def aggregate_by_mom_age(q, single=True):
+    groups = [{"from": 35}, {"from": 19, "to": 35}, {"from": 0, "to": 19}]
+
+    duedate_str = "doc['fields.rp_duedate'].value"
+    mombirth_str = "doc['fields.rp_mamafechanac'].value"
+    milliseconds2years_str = "/ 1000 / 60 / 60 / 24 / 365"
+    script_str = "({} - {}) {}".format(duedate_str, mombirth_str,
+                                       milliseconds2years_str)
+    if single:
         a = A(
-            'date_range',
-            field=settings.FIELDS_DELIVERY,
-            ranges=trimesters,
-            keyed=True)
+            'range',
+            script={"lang": "painless",
+                    "source": script_str},
+            ranges=groups)
+        q.aggs.bucket(BYMOMAGE_STR, a)
+    else:
+        q.bucket(
+            BYMOMAGE_STR,
+            'range',
+            script={"lang": "painless",
+                    "source": script_str},
+            ranges=groups)
+
+
+def aggregate_by_mom_age_run(q, single=True):
+    groups = [{"from": 35}, {"from": 19, "to": 35}, {"from": 0, "to": 19}]
+
+    if single:
+        a = A('range', field='contact_age', ranges=groups)
+        q.aggs.bucket(BYMOMAGE_STR, a)
+    else:
+        q.bucket(BYMOMAGE_STR, 'range', field='contact_age', ranges=groups)
+
+
+def aggregate_by_baby_age(q, single=True):
+    if single:
+        a = A('terms', field='baby_age')
         q.aggs.bucket(BYBABYAGE_STR, a)
-    return q
-
-
-def aggregate_per_week_pregnant(q, bucket=None):
-    weeks = [{
-        "from": datetime.now() + timedelta(days=7 * i),
-        "to": datetime.now() + timedelta(days=(i + 1) * 7),
-        "key": str(i + 1)
-    } for i in range(1, 40)]
-    weeks.append({
-        "from": datetime.now() + timedelta(days=40 * 7),
-        "key": "41"
-    })
-    weeks.append({"to": datetime.now() + timedelta(days=7), "key": "0"})
-    if bucket:
-        q.aggs[bucket].bucket(
-            BYWEEKPREGNAT_STR,
-            'date_range',
-            field=settings.FIELDS_DELIVERY,
-            ranges=weeks,
-            keyed=True)
     else:
-        a = A(
-            'date_range', field='fields.rp_duedate', ranges=weeks, keyed=True)
+        q.bucket(BYBABYAGE_STR, 'terms', field='baby_age')
+
+
+def aggregate_per_week_pregnant(q, single=True):
+    if single:
+        a = A('terms', field='pregnant_week', size=41)
         q.aggs.bucket(BYWEEKPREGNAT_STR, a)
-    return q
-
-
-def aggregate_by_run(q, bucket=None):
-    if bucket:
-        q.aggs[bucket].bucket(RUNSCOUNT_STR, 'children', type='run')
     else:
-        a = A('children', type='run')
-        q.aggs.bucket(RUNSCOUNT_STR, a)
-    return q
+        q.bucket(BYWEEKPREGNAT_STR, 'terms', field='pregnant_week', size=41)
 
 
-def aggregate_by_value(q, bucket=None):
-    if bucket:
-        q.aggs[bucket].bucket(VALUESCOUNT_STR, 'children', type='value')
+def aggregate_by_msg(q, single=True):
+    if single:
+        a = A('terms', field='msg', size=10)
+        q.aggs.bucket(BYMSG_STR, a)
     else:
-        a = A('children', type='value')
-        q.aggs.bucket(VALUESCOUNT_STR, a)
-    return q
+        q.bucket(BYMSG_STR, 'terms', field='msg', size=10)
 
 
-def aggregate_by_msg(q, bucket1, bucket2, bucket3):
-    q.aggs[bucket1].aggs[bucket2].aggs[bucket3].bucket(
-        BYMSG_STR, 'terms', field='msg', size=10)
-    return q
-
-
-def aggregate_by_flow(q):
+def aggregate_by_flow(q, single=True):
     a = A('terms', field='type', size=10)
     q.aggs.bucket(BYFLOW_STR, a)
-    return q
 
 
-def aggregate_by_way(q, bucket1, bucket2, bucket3):
-    q.aggs[bucket1].aggs[bucket2].aggs[bucket3].bucket(
-        BYWAY_STR, 'terms', field='is_one_way')
-    return q
-
-
-def filter_completed(q, bucket1, bucket2):
-    q.aggs[bucket1].aggs[bucket2].bucket(
-        FILTERCOMPLETED_STR, 'filter', term={'exit_type': 'completed'})
-    return q
-
-
-def filter_aggregate_by_date(q, bucket1, bucket2=None, range_date={"time":
-                                                                   {}}):
-    if bucket2:
-        q.aggs[bucket1].aggs[bucket2].bucket(
-            FILTERDATE_STR, 'filter', range=range_date)
+def aggregate_by_way(q, single=True):
+    if single:
+        a = A('terms', field='is_one_way')
+        q.aggs.bucket(BYWAY_STR, a)
     else:
-        q.aggs[bucket1].bucket(FILTERDATE_STR, 'filter', range=range_date)
+        q.bucket(BYWAY_STR, 'terms', field='is_one_way')
 
-    return q
+
+def aggregate_by_razon(q, field=None, single=True):
+    if single:
+        a = A('terms', field=field)
+        q.aggs.bucket(BYRAZON, a)
+
+    else:
+        q.bucket(BYRAZON, 'terms', field=field)
+
+
+def aggregate_by_calidad(q, calidad=None):
+    q.bucket(BYCALIDAD_STR, 'terms', field=calidad)
+
+
+def filter_completed(q):
+    q.bucket(FILTERCOMPLETED_STR, 'filter', term={'exit_type': 'completed'})
 
 
 def format_aggs_result(result, key):
@@ -276,33 +245,3 @@ def format_aggs_aggs_result(result, key_1, bucket_1, key_2, bucket_2):
             'count': j['doc_count']
         } for j in i[bucket_2].buckets]
     } for i in result.aggregations[bucket_1].buckets]
-
-
-def format_aggs_aggs_result_runs(result, key_1, bucket_1, key_2, bucket_2):
-    return [{
-        'state':
-        i['key'],
-        'result': [{
-            'msg': j['key'],
-            'count': j['doc_count']
-        } for j in i[RUNSCOUNT_STR][bucket_2].buckets]
-    } for i in result.aggregations[bucket_1].buckets]
-
-
-def format_aggs_aggs_result_runs_date(result, key_1, bucket_1, key_2,
-                                      bucket_2):
-    return [{
-        key_1:
-        i['key'],
-        'result': [{
-            key_2: j['key'],
-            'count': j['doc_count']
-        } for j in i[RUNSCOUNT_STR].filter_date[bucket_2].buckets]
-    } for i in result.aggregations[bucket_1].buckets]
-
-
-def format_aggs_runs(result, key):
-    return [{
-        key: i['key'],
-        'count': i[RUNSCOUNT_STR].filter_date['doc_count']
-    } for i in result]

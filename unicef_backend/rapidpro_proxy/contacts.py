@@ -1,19 +1,24 @@
-from elasticsearch_dsl import Q
 import sys
-from rapidpro_proxy.utils import *
-sys.path.insert(0, '..')
+
+from elasticsearch_dsl import Q
+
 import settings as settings
+from rapidpro_proxy.utils import *
+
+sys.path.insert(0, '..')
 
 
-def number_contacts_by_group(filter=[]):
+@date_decorator('created_on')
+def number_contacts_by_group(filter_date=[]):
 
-    q = search_contact(filter + [Q('match', group__name='PERSONAL_SALUD')])
+    q = search_contact(filter_date +
+                       [Q('match', group__name='PERSONAL_SALUD')])
     personal_contacts = q.count()
 
-    q = search_contact(filter + [Q('match', fields__rp_ispregnant='1')])
+    q = search_contact(filter_date + [Q('match', fields__rp_ispregnant='1')])
     pregnant_contacts = q.count()
 
-    q = search_contact(filter + [Q('match', fields__rp_ispregnant='0')])
+    q = search_contact(filter_date + [Q('match', fields__rp_ispregnant='0')])
     baby_contacts = q.count()
 
     groups = {
@@ -25,57 +30,66 @@ def number_contacts_by_group(filter=[]):
     return format_result(groups, key='group')
 
 
-@decorator('created_on')
-def number_contacts_by_state(filter=[], query=[]):
+@date_decorator('created_on')
+def number_contacts_by_state(filter_date=[], query=[]):
 
-    q = search_contact(filter + query)
-    q = aggregate_by_state(q)
+    q = search_contact(filter_date + query)
+    aggregate_by_state(q)
 
     response = q.execute()
     return format_aggs_result(
         response.aggregations[BYSTATE_STR].buckets, key='key')
 
 
-@decorator('created_on')
-def number_contacts_by_mun(state, filter=[], query=[]):
-    q = search_contact(
-        query + filter + [Q('term', fields__rp_state_number=state)])
-    q = aggregate_by_mun(q)
+@date_decorator('created_on')
+def number_contacts_by_mun(state, filter_date=[], query=[]):
+    q = search_contact(query + filter_date +
+                       [Q('term', fields__rp_state_number=state)])
+    aggregate_by_mun(q)
     response = q.execute()
 
     return format_aggs_result(
         response.aggregations[BYMUN_STR].buckets, key='key')
 
 
-def number_contacts_by_mom_age():
-    pass
+@date_decorator('rp_duedate')
+def number_contacts_by_mom_age(filter_date=[], query=[]):
+    q = search_contact(query + filter_date + [
+        Q('exists', field='fields.rp_mamafechanac'),
+        Q('exists', field='fields.rp_duedate')
+    ])
+    aggregate_by_mom_age(q)
+    response = q.execute()
+    return format_aggs_result(response.aggregations[BYMOMAGE_STR].buckets,
+                              'group')
 
 
-#@date_decorator()
-def number_contacts_by_baby_age(query=[]):
+@date_decorator('rp_duedate')
+def number_contacts_by_baby_age(query=[], filter_date=[]):
     q = search_contact(query)
-    q = aggregate_by_baby_age(q)
+    aggregate_by_baby_age(q)
     response = q.execute()
 
-    return response.aggregations[BYBABYAGE_STR].buckets
+    return format_aggs_result(response.aggregations[BYBABYAGE_STR].buckets,
+                              'trimester')
 
 
-@decorator('created_on')
-def number_contacts_by_hospital(filter=[], query=[]):
-    q = search_contact(query + filter)
-    q = aggregate_by_hospital(q)
+@date_decorator('created_on')
+def number_contacts_by_hospital(filter_date=[], query=[]):
+    q = search_contact(query + filter_date)
+    aggregate_by_hospital(q)
     response = q.execute()
 
     return format_aggs_result(
         response.aggregations[BYHOSPITAL_STR].buckets, key='key')
 
 
-@decorator('created_on')
-def number_contacts_by_channel(filter=[], query=[]):
-    q = search_contact(filter + query + [Q('match', urns='facebook')])
+@date_decorator('created_on')
+def number_contacts_by_channel(filter_date=[], query=[]):
+    q = search_contact(filter_date + query + [Q('match', urns='facebook')])
     facebook_contacts = q.count()
 
-    q = search_contact(filter + query + [Q('match', urns='tel')])
+    q = search_contact(filter_date + query + [Q('match', urns='tel')])
     sms_contacts = q.count()
 
     channels = {'facebook': facebook_contacts, 'sms': sms_contacts}
@@ -88,77 +102,89 @@ def number_contacts_by_channel(filter=[], query=[]):
 ##########################################################################
 
 
-@decorator('rp_deliverydate')
-def number_babies_by_state(query=[], filter=[]):
+@date_decorator('rp_deliverydate')
+def number_babies_by_state(query=[], filter_date=[]):
     return number_contacts_by_state(
-        query=filter + query + [Q('term', fields__rp_ispregnant='0')])
+        query=filter_date + query + [Q('term', fields__rp_ispregnant='0')])
 
 
-@decorator('rp_deliverydate')
-def number_babies_by_mun(state, filter=[], query=[]):
+@date_decorator('rp_deliverydate')
+def number_babies_by_mun(state, filter_date=[], query=[]):
     return number_contacts_by_mun(
-        state, query=filter + query + [Q('term', fields__rp_ispregnant='0')])
+        state,
+        query=filter_date + query + [Q('term', fields__rp_ispregnant='0')])
 
 
-def number_babies_by_mom_age():
-    pass
+@date_decorator('rp_deliverydate')
+def number_babies_by_mom_age(query=[], filter_date=[]):
+    return number_contacts_by_mom_age(
+        query=filter_date + query + [Q('term', fields__rp_ispregnant='0')])
 
 
-@decorator('rp_deliverydate')
-def number_babies_by_hospital(filter=[], query=[]):
+@date_decorator('rp_deliverydate')
+def number_babies_by_hospital(filter_date=[], query=[]):
     return number_contacts_by_hospital(
-        query=filter + query + [Q('term', fields__rp_ispregnant='0')])
+        query=filter_date + query + [Q('term', fields__rp_ispregnant='0')])
 
 
-#@decorator('rp_deliverydate')
-def number_babies_by_week():
-    q = search_contact([Q('term', fields__rp_ispregnant='1')])
-    q = aggregate_per_week_pregnant(q)
-    response = q.execute()
-    return response.aggregations[BYWEEKPREGNAT_STR].buckets
+#@date_decorator('rp_deliverydate')
+#def number_babies_by_baby_age(query=[], filter_date=[]):
+#    return number_contacts_by_baby_age(
+#        query=filter_date + query + [Q('term', fields__rp_ispregnant='0')])
 
 
 ##########################################################################
 #                              States part                               #
 ##########################################################################
-@decorator('rp_duedate')
-def number_pregnant_by_state(filter=[]):
-    return number_contacts_by_state(
-        filter + [Q('term', fields__rp_ispregnant='1')])
+@date_decorator('rp_duedate')
+def number_pregnant_by_state(filter_date=[]):
+    return number_contacts_by_state(filter_date +
+                                    [Q('term', fields__rp_ispregnant='1')])
 
 
-@decorator('rp_duedate')
-def number_moms_by_state(filter=[]):
-    return number_contacts_by_state(
-        filter + [Q('term', fields__rp_ispregnant='0')])
+@date_decorator('rp_duedate')
+def number_moms_by_state(filter_date=[]):
+    return number_contacts_by_state(filter_date +
+                                    [Q('term', fields__rp_ispregnant='0')])
 
 
-@decorator('created_on')
-def number_personal_by_state(filter=[]):
-    return number_contacts_by_state(
-        filter + [Q('term', groups__name='PERSONAL_SALUD')])
+@date_decorator('created_on')
+def number_personal_by_state(filter_date=[]):
+    return number_contacts_by_state(filter_date +
+                                    [Q('term', groups__name='PERSONAL_SALUD')])
 
 
-def number_moms_by_state_age():
-    pass
+@date_decorator('rp_duedate')
+def number_moms_by_state_age(filter_date=[]):
+    q = search_contact(filter_date + [
+        Q('exists', field='fields.rp_mamafechanac'),
+        Q('exists', field='fields.rp_duedate')
+    ])
+    aggregate_by_state(q)
+    aggregate_by_mom_age(q.aggs[BYSTATE_STR], single=False)
+
+    response = q.execute()
+    return format_aggs_aggs_result(response, 'state', BYSTATE_STR, 'group',
+                                   BYMOMAGE_STR)
 
 
-#@decorator('created_on')
-def number_baby_age_by_state():
+@date_decorator('rp_duedate')
+def number_baby_age_by_state(filter_date=[]):
 
     q = search_contact()
-    q = aggregate_by_state(q)
-    q = aggregate_by_baby_age(q, bucket=BYSTATE_STR)
+    aggregate_by_state(q)
+    aggregate_by_baby_age(q.aggs[BYSTATE_STR], single=False)
     response = q.execute()
 
-    return response.aggregations[BYSTATE_STR].buckets
+    return format_aggs_aggs_result(response, 'state', BYSTATE_STR, 'trimester',
+                                   BYBABYAGE_STR)
 
 
-@decorator('created_on')
-def number_hostpital_by_state(filter=[]):
-    q = search_contact(filter)
-    q = aggregate_by_state(q)
-    q = aggregate_by_hospital(q, bucket=BYSTATE_STR)
+@date_decorator('created_on')
+def number_hostpital_by_state(filter_date=[]):
+    q = search_contact(filter_date)
+    aggregate_by_state(q)
+    aggregate_by_hospital(q.aggs[BYSTATE_STR], single=False)
     response = q.execute()
 
     return format_aggs_aggs_result(
@@ -169,20 +195,20 @@ def number_hostpital_by_state(filter=[]):
         bucket_2=BYHOSPITAL_STR)
 
 
-@decorator('created_on')
-def number_channel_by_state(filter=[]):
+@date_decorator('created_on')
+def number_channel_by_state(filter_date=[]):
     result = {}
 
-    q = search_contact(filter + [Q('match', urns='facebook')])
-    q = aggregate_by_state(q)
+    q = search_contact(filter_date + [Q('match', urns='facebook')])
+    aggregate_by_state(q)
     response = q.execute()
     result['facebook'] = {
         i['key']: i['doc_count']
         for i in response.aggregations[BYSTATE_STR].buckets
     }
 
-    q = search_contact(filter + [Q('match', urns='tel')])
-    q = aggregate_by_state(q)
+    q = search_contact(filter_date + [Q('match', urns='tel')])
+    aggregate_by_state(q)
     response = q.execute()
     result['sms'] = {
         i['key']: i['doc_count']
@@ -194,77 +220,162 @@ def number_channel_by_state(filter=[]):
 ##########################################################################
 #                         Municipios part                               #
 ##########################################################################
-@decorator('rp_duedate')
-def number_pregnant_by_mun(state, filter=[]):
+@date_decorator('rp_duedate')
+def number_pregnant_by_mun(state, filter_date=[]):
     return number_contacts_by_mun(
-        state, query=filter + [Q('term', fields__rp_ispregnant='1')])
+        state, query=filter_date + [Q('term', fields__rp_ispregnant='1')])
 
 
-@decorator('rp_duedate')
-def number_moms_by_mun(state, filter=[]):
+@date_decorator('rp_duedate')
+def number_moms_by_mun(state, filter_date=[]):
     return number_contacts_by_mun(
-        state, query=filter + [Q('term', fields__rp_ispregnant='0')])
+        state, query=filter_date + [Q('term', fields__rp_ispregnant='0')])
 
 
-@decorator('created_on')
-def number_personal_by_mun(state, filter=[]):
+@date_decorator('created_on')
+def number_personal_by_mun(state, filter_date=[]):
     return number_contacts_by_mun(
-        state, query=filter + [Q('term', groups__name='PERSONAL_SALUD')])
+        state, query=filter_date + [Q('term', groups__name='PERSONAL_SALUD')])
 
 
-def number_moms_by_mun_age():
-    pass
+@date_decorator('rp_duedate')
+def number_moms_by_mun_age(state, filter_date=[]):
+    q = search_contact(filter_date + [
+        Q('exists', field='fields.rp_mamafechanac'),
+        Q('exists', field='fields.rp_duedate'),
+        Q('term', fields__rp_state_number=state)
+    ])
+    aggregate_by_mun(q)
+    aggregate_by_mom_age(q.aggs[BYMUN_STR], single=False)
+
+    response = q.execute()
+    return format_aggs_aggs_result(response, 'municipio', BYMUN_STR, 'group',
+                                   BYMOMAGE_STR)
 
 
-#@date_decorator
-def number_baby_age_by_mun(state, filter=[]):
-    q = search_contact([Q('term', fields__rp_state_number=state)] + filter)
-    q = aggregate_by_mun(q)
-    q = aggregate_by_baby_age(q, bucket=BYMUN_STR)
+@date_decorator('rp_duedate')
+def number_baby_age_by_mun(state, filter_date=[]):
+    q = search_contact([Q('term', fields__rp_state_number=state)] +
+                       filter_date)
+    aggregate_by_mun(q)
+    aggregate_by_baby_age(q.aggs[BYMUN_STR], single=False)
 
     response = q.execute()
 
-    return response.aggregations[BYMUN_STR].buckets
+    return format_aggs_aggs_result(response, 'municipio', BYMUN_STR,
+                                   'trimester', BYBABYAGE_STR)
 
 
-@decorator('created_on')
-def number_hostpital_by_mun(state, filter=[]):
-    q = search_contact([Q('term', fields__rp_state_number=state)] + filter)
-    q = aggregate_by_mun(q)
-    q = aggregate_by_hospital(q, bucket=BYMUN_STR)
+@date_decorator('created_on')
+def number_hostpital_by_mun(state, filter_date=[]):
+    q = search_contact([Q('term', fields__rp_state_number=state)] +
+                       filter_date)
+    aggregate_by_mun(q)
+    aggregate_by_hospital(q.aggs[BYMUN_STR], single=False)
 
     response = q.execute()
 
     return format_aggs_aggs_result(
-        response.aggregations[BYMUN_STR].buckets,
+        response,
         key_1='municipio',
         bucket_1=BYMUN_STR,
         key_2='hospital',
         bucket_2=BYHOSPITAL_STR)
 
 
-@decorator('created_on')
-def number_channel_by_mun(state, filter=[]):
+@date_decorator('created_on')
+def number_channel_by_mun(state, filter_date=[]):
     result = {}
-    q = search_contact(filter + [
+    q = search_contact(filter_date + [
         Q('term', fields__rp_state_number=state),
         Q('match', urns='facebook')
     ])
-    q = aggregate_by_mun(q)
+    aggregate_by_mun(q)
     response = q.execute()
     result['facebook'] = {
         i['key']: i['doc_count']
         for i in response.aggregations[BYMUN_STR].buckets
     }
 
-    q = search_contact(
-        filter +
-        [Q('term', fields__rp_state_number=state),
-         Q('match', urns='tel')])
-    q = aggregate_by_mun(q)
+    q = search_contact(filter_date + [
+        Q('term', fields__rp_state_number=state),
+        Q('match', urns='tel')
+    ])
+    aggregate_by_mun(q)
     response = q.execute()
     result['sms'] = {
         i['key']: i['doc_count']
         for i in response.aggregations[BYMUN_STR].buckets
     }
     return result
+
+
+@date_decorator('created_on')
+def get_calidad_medica_by_state(calidad_field, filter_date=[]):
+    q = search_contact(filter_date)
+    aggregate_by_state(q)
+    aggregate_by_calidad(q.aggs[BYSTATE_STR], calidad_field)
+
+    response = q.execute()
+
+    return response.aggregations[BYSTATE_STR]
+
+
+@date_decorator('created_on')
+def get_calidad_medica_by_mun(state, calidad_field, filter_date=[]):
+    q = search_contact(filter_date +
+                       [Q('term', fields__rp_state_number=state)])
+    aggregate_by_mun(q)
+    aggregate_by_calidad(q.aggs[BYMUN_STR], calidad_field)
+
+    response = q.execute()
+
+    return response.aggregations[BYMUN_STR]
+
+
+@date_decorator('created_on')
+def get_calidad_medica_by_hospital(state, calidad_field, filter_date=[]):
+    q = search_contact(filter_date)
+    aggregate_by_hospital(q)
+    aggregate_by_calidad(q.aggs[BYHOSPITAL_STR], calidad_field)
+
+    response = q.execute()
+
+    return response.aggregations[BYHOSPITAL_STR]
+
+
+@date_decorator('created_on')
+def get_calidad_medica_by_mom_age(calidad_field, filter_date=[]):
+    q = search_contact(query + filter_date + [
+        Q('exists', field='fields.rp_mamafechanac'),
+        Q('exists', field='fields.rp_duedate')
+    ])
+    aggregate_by_mom_age(q)
+
+    aggregate_by_calidad(q.aggs[BYMOMAGE_STR], calidad_field)
+
+    response = q.execute()
+
+    return response.aggregations[BYSTATE_STR]
+
+
+@date_decorator('created_on')
+def get_calidad_medica_by_baby_age(calidad_field, filter_date=[]):
+    q = search_contact(filter_date)
+    aggregate_by_baby_age(q)
+    aggregate_by_calidad(q.aggs[BYBABYAGE_STR], calidad_field)
+
+    response = q.execute()
+
+    return response.aggregations[BYBABYAGE_STR]
+
+
+@date_decorator('created_on')
+def ge_calidad_medica_by_hospital(state, calidad_field, filter_date=[]):
+    q = search_contact(filter_date)
+    aggregate_per_week_pregnant(q)
+    aggregate_by_calidad(q.aggs[BYWEEKPREGNAT_STR], calidad_field)
+
+    response = q.execute()
+
+    return response.aggregations[BYWEEKPREGNAT_STR]

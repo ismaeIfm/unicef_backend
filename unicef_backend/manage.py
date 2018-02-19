@@ -27,7 +27,7 @@ CONTACT_FIELDS = {
     'rp_ispregnant': _format_str,
     'rp_mun': _format_str,
     'rp_atenmed': _format_str,
-    'rp_Mamafechanac': _format_date,
+    'rp_mamafechanac': _format_date,
     'rp_duedate': _format_date,
     'rp_razonalerta': _format_str,
     'rp_razonbaja': _format_str,
@@ -92,14 +92,22 @@ def get_type_flow(flow_name):
 
 
 def insert_run(run, path_item, action, c):
-    contact_age = _get_difference_dates(path_item.time,
-                                        c.fields.rp_Mamafechanac, 'y')
+    contact_age = _get_difference_dates(c.fields.rp_mamafechanac,
+                                        path_item.time, 'y')
     baby_age = _get_difference_dates(path_item.time, c.fields.rp_deliverydate,
                                      'm')
-    week_pregnant = _get_difference_dates(c.fields.rp_duedate, path_item.time,
-                                          'w')
+    pregnant_difference = _get_difference_dates(c.fields.rp_duedate,
+                                                path_item.time, 'w')
+    week_pregnant, trimester_baby_age = None, None
+    if pregnant_difference and pregnant_difference <= 40:
+        week_pregnant = 40 - pregnant_difference if pregnant_difference <= 40 else 41
+        c.update_week(week_pregnant)
+    if baby_age and baby_age >= 0 and baby_age <= 24:
+        trimester_baby_age = baby_age // 3
+        c.update_baby_age(trimester_baby_age)
 
     run_dict = {
+        'urns': c.urns,
         'flow_uuid': run.flow.uuid,
         'flow_name': run.flow.name,
         'contact_uuid': run.contact.uuid,
@@ -112,12 +120,15 @@ def insert_run(run, path_item, action, c):
         'is_one_way': False if run.values else True,
         'fields': {
             'rp_ispregnant': _format_str(c.fields.rp_ispregnant),
+            'rp_state_number': _format_str(c.fields.rp_state_number),
             'rp_mun': _format_str(c.fields.rp_mun),
             'rp_atenmed': _format_str(c.fields.rp_atenmed),
+            'rp_razonalerta': _format_str(c.fields.rp_razonalerta),
+            'rp_razonbaja': _format_str(c.fields.rp_razonbaja),
             'contact_age': contact_age,
-            'baby_age': baby_age,
-            'week_pregnant': 40 - week_pregnant if week_pregnant else None
-        }
+        },
+        'baby_age': trimester_baby_age,
+        'pregnant_week': week_pregnant
     }
 
     r = Run(**run_dict)
@@ -131,7 +142,6 @@ def update_runs(after=None, last_runs=None):
             retry_on_rate_exceed=True)
     for run in last_runs:
         c = search_contact(run.contact.uuid)
-        print(type(c))
         if run.flow.uuid == settings.MIALERTA_FLOW:  #MiAlerta
             pass
             #insert_value_run(run) TODO
@@ -183,8 +193,7 @@ def load_runs_from_csv(force=False):
                 r.save()
 
 
-@manager.command
-def load_flows(force=False):
+def load_flows():
     Action.init()
     data = json.load(open('actions.json'))
     for i in tqdm(data, desc='==> Getting Actions'):
@@ -219,6 +228,7 @@ def create_index():
     for t in [Action, Contact, Run]:
         index.doc_type(t)
     index.create()
+    load_flows()
 
 
 @manager.command
