@@ -52,7 +52,7 @@ def number_contacts_by_mun(state, filter_date=[], query=[]):
         response.aggregations[BYMUN_STR].buckets, key='key')
 
 
-@date_decorator('rp_duedate')
+@date_decorator('rp_deliverydate')
 def number_contacts_by_mom_age(filter_date=[], query=[]):
     q = search_contact(query + filter_date + [
         Q('exists', field='fields.rp_mamafechanac'),
@@ -64,7 +64,7 @@ def number_contacts_by_mom_age(filter_date=[], query=[]):
                               'group')
 
 
-@date_decorator('rp_duedate')
+@date_decorator('rp_deliverydate')
 def number_contacts_by_baby_age(query=[], filter_date=[]):
     q = search_contact(query)
     aggregate_by_baby_age(q)
@@ -142,7 +142,7 @@ def number_pregnant_by_state(filter_date=[]):
                                     [Q('term', fields__rp_ispregnant='1')])
 
 
-@date_decorator('rp_duedate')
+@date_decorator('rp_deliverydate')
 def number_moms_by_state(filter_date=[]):
     return number_contacts_by_state(filter_date +
                                     [Q('term', fields__rp_ispregnant='0')])
@@ -154,7 +154,7 @@ def number_personal_by_state(filter_date=[]):
                                     [Q('term', groups__name='PERSONAL_SALUD')])
 
 
-@date_decorator('rp_duedate')
+@date_decorator('rp_deliverydate')
 def number_moms_by_state_age(filter_date=[]):
     q = search_contact(filter_date + [
         Q('exists', field='fields.rp_mamafechanac'),
@@ -168,7 +168,7 @@ def number_moms_by_state_age(filter_date=[]):
                                    BYMOMAGE_STR)
 
 
-@date_decorator('rp_duedate')
+@date_decorator('rp_deliverydate')
 def number_baby_age_by_state(filter_date=[]):
 
     q = search_contact()
@@ -226,7 +226,7 @@ def number_pregnant_by_mun(state, filter_date=[]):
         state, query=filter_date + [Q('term', fields__rp_ispregnant='1')])
 
 
-@date_decorator('rp_duedate')
+@date_decorator('rp_deliverydate')
 def number_moms_by_mun(state, filter_date=[]):
     return number_contacts_by_mun(
         state, query=filter_date + [Q('term', fields__rp_ispregnant='0')])
@@ -238,7 +238,7 @@ def number_personal_by_mun(state, filter_date=[]):
         state, query=filter_date + [Q('term', groups__name='PERSONAL_SALUD')])
 
 
-@date_decorator('rp_duedate')
+@date_decorator('rp_deliverydate')
 def number_moms_by_mun_age(state, filter_date=[]):
     q = search_contact(filter_date + [
         Q('exists', field='fields.rp_mamafechanac'),
@@ -253,7 +253,7 @@ def number_moms_by_mun_age(state, filter_date=[]):
                                    BYMOMAGE_STR)
 
 
-@date_decorator('rp_duedate')
+@date_decorator('rp_deliverydate')
 def number_baby_age_by_mun(state, filter_date=[]):
     q = search_contact([Q('term', fields__rp_state_number=state)] +
                        filter_date)
