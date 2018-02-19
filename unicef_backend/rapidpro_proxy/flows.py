@@ -15,7 +15,8 @@ def _aux_number_by_state(flow_uuid, field, filter_date=[]):
     aggregate_by_state(q)
     aggregate_by_razon(q.aggs[BYSTATE_STR], field, single=False)
     response = q.execute()
-    return response.aggregations[BYSTATE_STR].buckets
+    return format_aggs_aggs_result(response, 'state', BYSTATE_STR, 'reason',
+                                   BYRAZON)
 
 
 def _aux_number_by_mun(state, flow_uuid, field, filter_date=[]):
@@ -28,7 +29,8 @@ def _aux_number_by_mun(state, flow_uuid, field, filter_date=[]):
 
     response = q.execute()
 
-    return response.aggregations[BYMUN_STR].buckets
+    return format_aggs_aggs_result(response, 'municipio', BYMUN_STR, 'reason',
+                                   BYRAZON)
 
 
 def _aux_number_by_hospital(flow_uuid, field, filter_date=[]):
@@ -37,7 +39,8 @@ def _aux_number_by_hospital(flow_uuid, field, filter_date=[]):
     aggregate_by_razon(q.aggs[BYHOSPITAL_STR], field, single=False)
     response = q.execute()
 
-    return response.aggregations[BYHOSPITAL_STR].buckets
+    return format_aggs_aggs_result(response, 'hospital', BYHOSPITAL_STR,
+                                   'reason', BYRAZON)
 
 
 def _aux_channel(flow_uuid, field, filter_date=[]):
@@ -62,7 +65,8 @@ def _aux_number_by_baby_age(flow_uuid, field, filter_date=[]):
     aggregate_by_razon(q.aggs[BYBABYAGE_STR], field, single=False)
     response = q.execute()
 
-    return response.aggregations[BYBABYAGE_STR].buckets
+    return format_aggs_aggs_result(response, 'trimester', BYBABYAGE_STR,
+                                   'reason', BYRAZON)
 
 
 @date_decorator("time")
@@ -147,7 +151,8 @@ def number_sent_msgs_by_baby_age(filter_date=[]):
 
     response = q.execute()
 
-    return response.aggregations.by_baby_age.buckets
+    return format_aggs_aggs_result(response, 'trimester', BYBABYAGE_STR, 'msg',
+                                   BYMSG_STR)
 
 
 ##########################################################################
