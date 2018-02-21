@@ -6,3 +6,5 @@ redis==2.10.6
 elasticsearch-dsl==5.4.0
 tqdm==4.15.0
 webargs==1.8.1
+flask-swagger-ui
+flasgger
