@@ -142,12 +142,41 @@ def update_runs(after=None, last_runs=None):
             retry_on_rate_exceed=True)
     for run in last_runs:
         c = search_contact(run.contact.uuid)
-        if run.flow.uuid == settings.MIALERTA_FLOW:  #MiAlerta
-            pass
-            #insert_value_run(run) TODO
-        elif run.flow.uuid == settings.CANCEL_FLOW:  #Cancela
-            pass
-            #insert_value_run(run) TODO
+        try:
+            if run.flow.uuid in settings.UPDATE_CONTACT_UUIDS:
+                contacts = mx_client.get_contacts(uuid=run.contact.uuid).all()
+                contact = contacts[0]
+                c.fields.rp_razonalerta = contact.fields.get('rp_razonalerta')
+                c.fields.rp_razonbaja = contact.fields.get('rp_razonbaja')
+                c.save()
+
+            elif run.flow.uuid in [
+                    settings.MIALERTA_FLOW, settings.CANCEL_FLOW
+            ]:
+                contacts = mx_client.get_contacts(uuid=run.contact.uuid).all()
+                contact = contacts[0]
+                if c.fields.rp_state_number != contact.fields.get(
+                        'rp_mun'
+                ) or c.fields.rp_ispregnant != contact.fields.get(
+                        'rp_ispregnant'
+                ) or c.fields.rp_state_number != contact.fields.get(
+                        'rp_state_number'
+                ) or c.fields.rp_deliverydate != contact.fields.get(
+                        'rp_deliverydate'):
+                    aux_c = c.to_dict()
+                    del aux_c['uuid']
+                    Contact(**aux_c).save()
+                    c.fields.rp_state_number = contact.fields.get('rp_mun')
+                    c.fields.rp_ispregnant = contact.fields.get(
+                        'rp_ispregnant')
+                    c.fields.rp_state_number = contact.fields.get(
+                        'rp_state_number')
+                    c.fields.rp_deliverydate = contact.fields.get(
+                        'rp_deliverydate')
+                    c.save()
+        except IndexError:
+            continue
+
         for path_item in run.path:
             try:
                 action = Action.get(id=path_item.node)  # Search action
@@ -168,7 +197,7 @@ def load_runs_from_csv(force=False):
             flow_name = row["flow_name"].strip() if row["flow_name"] else ""
             contact_uuid = row["contact_uuid"].strip() if row[
                 "contact_uuid"] else ""
-            responded =  row["responded"]
+            responded = row["responded"]
             exit_type = row["exit_type"]
             is_one_way = row["values"]
             if not row["path"]:
@@ -187,10 +216,10 @@ def load_runs_from_csv(force=False):
                 path_item_time = parse(path_item["arrived_on"])
                 contact_age = _get_difference_dates(c.fields.rp_mamafechanac,
                                                     path_item_time, 'y')
-                baby_age = _get_difference_dates(path_item_time, c.fields.rp_deliverydate,
-                                                 'm')
-                pregnant_difference = _get_difference_dates(c.fields.rp_duedate,
-                                                            path_item_time, 'w')
+                baby_age = _get_difference_dates(path_item_time,
+                                                 c.fields.rp_deliverydate, 'm')
+                pregnant_difference = _get_difference_dates(
+                    c.fields.rp_duedate, path_item_time, 'w')
                 week_pregnant, trimester_baby_age = None, None
                 if pregnant_difference and pregnant_difference <= 40:
                     week_pregnant = 40 - pregnant_difference if pregnant_difference <= 40 else 41
@@ -209,7 +238,8 @@ def load_runs_from_csv(force=False):
                     'msg': action['msg'],
                     'fields': {
                         'rp_ispregnant': _format_str(c.fields.rp_ispregnant),
-                        'rp_state_number': _format_str(c.fields.rp_state_number),
+                        'rp_state_number':
+                        _format_str(c.fields.rp_state_number),
                         'rp_mun': _format_str(c.fields.rp_mun),
                         'rp_atenmed': _format_str(c.fields.rp_atenmed),
                         'rp_razonalerta': _format_str(c.fields.rp_razonalerta),
@@ -220,7 +250,7 @@ def load_runs_from_csv(force=False):
                     'pregnant_week': week_pregnant,
                     'responded': responded,
                     'exit_type': exit_type,
-                    'is_one_way':is_one_way
+                    'is_one_way': is_one_way
                 }
                 r = Run(**run_dict)
                 r.meta.parent = contact_uuid

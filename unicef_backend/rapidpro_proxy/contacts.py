@@ -33,7 +33,7 @@ def number_contacts_by_group(filter_date=[]):
 @date_decorator('created_on')
 def number_contacts_by_state(filter_date=[], query=[]):
 
-    q = search_contact(filter_date + query)
+    q = search_contact(filter_date + query, + [Q('exists', field='uuid')])
     aggregate_by_state(q)
 
     response = q.execute()
@@ -43,8 +43,10 @@ def number_contacts_by_state(filter_date=[], query=[]):
 
 @date_decorator('created_on')
 def number_contacts_by_mun(state, filter_date=[], query=[]):
-    q = search_contact(query + filter_date +
-                       [Q('term', fields__rp_state_number=state)])
+    q = search_contact(query + filter_date + [
+        Q('term', fields__rp_state_number=state),
+        Q('exists', field='uuid')
+    ])
     aggregate_by_mun(q)
     response = q.execute()
 
@@ -76,7 +78,7 @@ def number_contacts_by_baby_age(query=[], filter_date=[]):
 
 @date_decorator('created_on')
 def number_contacts_by_hospital(filter_date=[], query=[]):
-    q = search_contact(query + filter_date)
+    q = search_contact(query + filter_date + Q('exists', field='uuid'))
     aggregate_by_hospital(q)
     response = q.execute()
 
@@ -86,7 +88,10 @@ def number_contacts_by_hospital(filter_date=[], query=[]):
 
 @date_decorator('created_on')
 def number_contacts_by_channel(filter_date=[], query=[]):
-    q = search_contact(filter_date + query + [Q('match', urns='facebook')])
+    q = search_contact(filter_date + query + [
+        Q('match', urns='facebook'),
+        Q('exists', field='uuid')
+    ])
     facebook_contacts = q.count()
 
     q = search_contact(filter_date + query + [Q('match', urns='tel')])
@@ -182,7 +187,7 @@ def number_baby_age_by_state(filter_date=[]):
 
 @date_decorator('created_on')
 def number_hostpital_by_state(filter_date=[]):
-    q = search_contact(filter_date)
+    q = search_contact(filter_date + [Q('exists', field='uuid')])
     aggregate_by_state(q)
     aggregate_by_hospital(q.aggs[BYSTATE_STR], single=False)
     response = q.execute()
@@ -199,7 +204,9 @@ def number_hostpital_by_state(filter_date=[]):
 def number_channel_by_state(filter_date=[]):
     result = {}
 
-    q = search_contact(filter_date + [Q('match', urns='facebook')])
+    q = search_contact(
+        filter_date + [Q('match', urns='facebook'),
+                       Q('exists', field='uuid')])
     aggregate_by_state(q)
     response = q.execute()
     result['facebook'] = {
@@ -207,7 +214,9 @@ def number_channel_by_state(filter_date=[]):
         for i in response.aggregations[BYSTATE_STR].buckets
     }
 
-    q = search_contact(filter_date + [Q('match', urns='tel')])
+    q = search_contact(filter_date +
+                       [Q('match', urns='tel'),
+                        Q('exists', field='uuid')])
     aggregate_by_state(q)
     response = q.execute()
     result['sms'] = {
@@ -268,8 +277,9 @@ def number_baby_age_by_mun(state, filter_date=[]):
 
 @date_decorator('created_on')
 def number_hostpital_by_mun(state, filter_date=[]):
-    q = search_contact([Q('term', fields__rp_state_number=state)] +
-                       filter_date)
+    q = search_contact(
+        [Q('term', fields__rp_state_number=state),
+         Q('exists', field='uuid')] + filter_date)
     aggregate_by_mun(q)
     aggregate_by_hospital(q.aggs[BYMUN_STR], single=False)
 
@@ -288,7 +298,8 @@ def number_channel_by_mun(state, filter_date=[]):
     result = {}
     q = search_contact(filter_date + [
         Q('term', fields__rp_state_number=state),
-        Q('match', urns='facebook')
+        Q('match', urns='facebook'),
+        Q('exists', field='uuid')
     ])
     aggregate_by_mun(q)
     response = q.execute()
@@ -299,7 +310,8 @@ def number_channel_by_mun(state, filter_date=[]):
 
     q = search_contact(filter_date + [
         Q('term', fields__rp_state_number=state),
-        Q('match', urns='tel')
+        Q('match', urns='tel'),
+        Q('exists', field='uuid')
     ])
     aggregate_by_mun(q)
     response = q.execute()
@@ -312,7 +324,7 @@ def number_channel_by_mun(state, filter_date=[]):
 
 @date_decorator('created_on')
 def get_calidad_medica_by_state(calidad_field, filter_date=[]):
-    q = search_contact(filter_date)
+    q = search_contact(filter_date=[Q('exists', field='uuid')])
     aggregate_by_state(q)
     aggregate_by_calidad(q.aggs[BYSTATE_STR], calidad_field)
 
@@ -323,8 +335,10 @@ def get_calidad_medica_by_state(calidad_field, filter_date=[]):
 
 @date_decorator('created_on')
 def get_calidad_medica_by_mun(state, calidad_field, filter_date=[]):
-    q = search_contact(filter_date +
-                       [Q('term', fields__rp_state_number=state)])
+    q = search_contact(filter_date + [
+        Q('term', fields__rp_state_number=state),
+        Q('exists', field='uuid')
+    ])
     aggregate_by_mun(q)
     aggregate_by_calidad(q.aggs[BYMUN_STR], calidad_field)
 
@@ -335,7 +349,7 @@ def get_calidad_medica_by_mun(state, calidad_field, filter_date=[]):
 
 @date_decorator('created_on')
 def get_calidad_medica_by_hospital(state, calidad_field, filter_date=[]):
-    q = search_contact(filter_date)
+    q = search_contact(filter_date + [Q('exists', field='uuid')])
     aggregate_by_hospital(q)
     aggregate_by_calidad(q.aggs[BYHOSPITAL_STR], calidad_field)
 
@@ -344,7 +358,7 @@ def get_calidad_medica_by_hospital(state, calidad_field, filter_date=[]):
     return response.aggregations[BYHOSPITAL_STR]
 
 
-@date_decorator('created_on')
+@date_decorator('rp_duedate')
 def get_calidad_medica_by_mom_age(calidad_field, filter_date=[]):
     q = search_contact(query + filter_date + [
         Q('exists', field='fields.rp_mamafechanac'),
@@ -359,7 +373,7 @@ def get_calidad_medica_by_mom_age(calidad_field, filter_date=[]):
     return response.aggregations[BYSTATE_STR]
 
 
-@date_decorator('created_on')
+@date_decorator('rp_deliverydate')
 def get_calidad_medica_by_baby_age(calidad_field, filter_date=[]):
     q = search_contact(filter_date)
     aggregate_by_baby_age(q)
@@ -372,7 +386,7 @@ def get_calidad_medica_by_baby_age(calidad_field, filter_date=[]):
 
 @date_decorator('created_on')
 def ge_calidad_medica_by_hospital(state, calidad_field, filter_date=[]):
-    q = search_contact(filter_date)
+    q = search_contact(filter_date + [Q('exists', field='uuid')])
     aggregate_per_week_pregnant(q)
     aggregate_by_calidad(q.aggs[BYWEEKPREGNAT_STR], calidad_field)
 
