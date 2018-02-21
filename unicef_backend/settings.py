@@ -2,7 +2,7 @@ import os
 
 ################### Redis host configuration ##########################
 CELERY_TIMEZONE = 'America/Mexico_City'
-BROKER_URL =  os.getenv('BROKER_URL')
+BROKER_URL = os.getenv('BROKER_URL')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
 
 ################## Elasticsearch configuration ########################
@@ -28,3 +28,13 @@ CANCEL_NODE = "response_3"
 FIELDS_STATE = "fields.rp_state_number"
 FIELDS_MUN = "fields.rp_mun"
 FIELDS_DELIVERY = "fields.rp_deliverydate"
+
+UPDATE_CONTACT_UUIDS = [
+    '8b6ae8ad-84d6-4c6c-80bb-b10a846b23ec',
+    'c57676f9-b20a-46e0-b842-8bf44eb780f0',
+    '25a57e10-d964-40d2-9802-212eee16f149',
+    '8e688d4a-227e-4781-8d86-b97866f29eda',
+    'bae111bf-dd0a-4788-8e79-eb780b857513',
+    '6178e212-f2d8-4abb-aeaf-613299941ff4',
+    '989664a7-4ee0-407b-a1d6-cdb90845b996'
+]

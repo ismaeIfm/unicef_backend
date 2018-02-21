@@ -92,6 +92,8 @@ def date_decorator(argument):
                 if argument == "rp_deliverydate":
                     filter_date = Q(
                         'range', fields__rp_deliverydate=filter_date)
+                elif argument == "rp_duedate":
+                    filter_date = Q('range', fields__rp_duedate=filter_date)
                 elif argument == "time":
                     filter_date = Q('range', time=filter_date)
                 else:
