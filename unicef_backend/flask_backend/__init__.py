@@ -4,6 +4,11 @@ from celery import Celery
 from elasticsearch_dsl.connections import connections
 from flask_backend.views import api
 from flask_backend.config import config
+from flask_swagger_ui import get_swaggerui_blueprint
+
+from flask_backend.views import *
+from flasgger import Swagger
+
 
 celery = Celery()
 
@@ -19,5 +24,6 @@ def create_app(config_name=None):
         hosts=[app.config['ELASTICSEARCH_HOST']], timeout=20)
 
     app.register_blueprint(api)
+    swagger = Swagger(app)
 
     return app
