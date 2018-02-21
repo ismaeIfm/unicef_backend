@@ -33,7 +33,7 @@ def number_contacts_by_group(filter_date=[]):
 @date_decorator('created_on')
 def number_contacts_by_state(filter_date=[], query=[]):
 
-    q = search_contact(filter_date + query, + [Q('exists', field='uuid')])
+    q = search_contact(filter_date + query + [Q('exists', field='uuid')])
     aggregate_by_state(q)
 
     response = q.execute()
@@ -78,7 +78,7 @@ def number_contacts_by_baby_age(query=[], filter_date=[]):
 
 @date_decorator('created_on')
 def number_contacts_by_hospital(filter_date=[], query=[]):
-    q = search_contact(query + filter_date + Q('exists', field='uuid'))
+    q = search_contact(query + filter_date + [Q('exists', field='uuid')])
     aggregate_by_hospital(q)
     response = q.execute()
 
@@ -324,13 +324,14 @@ def number_channel_by_mun(state, filter_date=[]):
 
 @date_decorator('created_on')
 def get_calidad_medica_by_state(calidad_field, filter_date=[]):
-    q = search_contact(filter_date=[Q('exists', field='uuid')])
+    q = search_contact(filter_date + [Q('exists', field='uuid')])
     aggregate_by_state(q)
     aggregate_by_calidad(q.aggs[BYSTATE_STR], calidad_field)
 
     response = q.execute()
 
-    return response.aggregations[BYSTATE_STR]
+    return format_aggs_aggs_result(response, 'state', BYSTATE_STR, 'calidad',
+                                   BYCALIDAD_STR)
 
 
 @date_decorator('created_on')
@@ -344,23 +345,25 @@ def get_calidad_medica_by_mun(state, calidad_field, filter_date=[]):
 
     response = q.execute()
 
-    return response.aggregations[BYMUN_STR]
+    return format_aggs_aggs_result(response, 'municipio', BYMUN_STR, 'calidad',
+                                   BYCALIDAD_STR)
 
 
 @date_decorator('created_on')
-def get_calidad_medica_by_hospital(state, calidad_field, filter_date=[]):
+def get_calidad_medica_by_hospital(calidad_field, filter_date=[]):
     q = search_contact(filter_date + [Q('exists', field='uuid')])
     aggregate_by_hospital(q)
     aggregate_by_calidad(q.aggs[BYHOSPITAL_STR], calidad_field)
 
     response = q.execute()
 
-    return response.aggregations[BYHOSPITAL_STR]
+    return format_aggs_aggs_result(response, 'hospital', BYHOSPITAL_STR,
+                                   'calidad', BYCALIDAD_STR)
 
 
 @date_decorator('rp_duedate')
 def get_calidad_medica_by_mom_age(calidad_field, filter_date=[]):
-    q = search_contact(query + filter_date + [
+    q = search_contact(filter_date + [
         Q('exists', field='fields.rp_mamafechanac'),
         Q('exists', field='fields.rp_duedate')
     ])
@@ -370,7 +373,8 @@ def get_calidad_medica_by_mom_age(calidad_field, filter_date=[]):
 
     response = q.execute()
 
-    return response.aggregations[BYSTATE_STR]
+    return format_aggs_aggs_result(response, 'age', BYMOMAGE_STR, 'calidad',
+                                   BYCALIDAD_STR)
 
 
 @date_decorator('rp_deliverydate')
@@ -381,15 +385,17 @@ def get_calidad_medica_by_baby_age(calidad_field, filter_date=[]):
 
     response = q.execute()
 
-    return response.aggregations[BYBABYAGE_STR]
+    return format_aggs_aggs_result(response, 'baby_age', BYBABYAGE_STR,
+                                   'calidad', BYCALIDAD_STR)
 
 
 @date_decorator('created_on')
-def ge_calidad_medica_by_hospital(state, calidad_field, filter_date=[]):
+def ge_calidad_medica_by_hospital(calidad_field, filter_date=[]):
     q = search_contact(filter_date + [Q('exists', field='uuid')])
     aggregate_per_week_pregnant(q)
     aggregate_by_calidad(q.aggs[BYWEEKPREGNAT_STR], calidad_field)
 
     response = q.execute()
 
-    return response.aggregations[BYWEEKPREGNAT_STR]
+    return format_aggs_aggs_result(response, 'pregnant_week',
+                                   BYWEEKPREGNAT_STR, 'calidad', BYCALIDAD_STR)

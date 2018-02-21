@@ -223,7 +223,7 @@ def aggregate_by_razon(q, field=None, single=True):
 
 
 def aggregate_by_calidad(q, calidad=None):
-    q.bucket(BYCALIDAD_STR, 'terms', field=calidad)
+    q.bucket(BYCALIDAD_STR, 'terms', field='{}.{}'.format('fields', calidad))
 
 
 def filter_completed(q):
@@ -245,5 +245,21 @@ def format_aggs_aggs_result(result, key_1, bucket_1, key_2, bucket_2):
         'result': [{
             key_2: j['key'],
             'count': j['doc_count']
+        } for j in i[bucket_2].buckets]
+    } for i in result.aggregations[bucket_1].buckets]
+
+
+def format_aggs_aggs_aggs_result(result, key_1, bucket_1, key_2, bucket_2,
+                                 key_3, bucket_3):
+    return [{
+        key_1:
+        i['key'],
+        'result': [{
+            key_2:
+            j['key'],
+            'result': [{
+                key_3: k['key'],
+                'count': k['doc_count']
+            } for k in j[bucket_3].buckets]
         } for j in i[bucket_2].buckets]
     } for i in result.aggregations[bucket_1].buckets]
