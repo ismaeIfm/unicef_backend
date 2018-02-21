@@ -168,10 +168,15 @@ def load_runs_from_csv(force=False):
             flow_name = row["flow_name"].strip() if row["flow_name"] else ""
             contact_uuid = row["contact_uuid"].strip() if row[
                 "contact_uuid"] else ""
+            responded =  row["responded"]
+            exit_type = row["exit_type"]
+            is_one_way = row["values"]
             if not row["path"]:
                 continue
             path = row["path"].strip().replace("null", '"null"')
-            search_contact(contact_uuid)
+            c = search_contact(contact_uuid)
+            if not c:
+                continue
             for path_item in ast.literal_eval(path):
                 try:
                     action = Action.get(
@@ -179,17 +184,46 @@ def load_runs_from_csv(force=False):
                 except NotFoundError:
                     #We ignore the path item if has a split or a group action
                     continue
+                path_item_time = parse(path_item["arrived_on"])
+                contact_age = _get_difference_dates(c.fields.rp_mamafechanac,
+                                                    path_item_time, 'y')
+                baby_age = _get_difference_dates(path_item_time, c.fields.rp_deliverydate,
+                                                 'm')
+                pregnant_difference = _get_difference_dates(c.fields.rp_duedate,
+                                                            path_item_time, 'w')
+                week_pregnant, trimester_baby_age = None, None
+                if pregnant_difference and pregnant_difference <= 40:
+                    week_pregnant = 40 - pregnant_difference if pregnant_difference <= 40 else 41
+                    c.update_week(week_pregnant)
+                if baby_age and baby_age >= 0 and baby_age <= 24:
+                    trimester_baby_age = baby_age // 3
+                    c.update_baby_age(trimester_baby_age)
                 run_dict = {
+                    'urns': c.urns,
                     'flow_uuid': flow_uuid,
                     'flow_name': flow_name,
                     'contact_uuid': contact_uuid,
                     'type': get_type_flow(flow_name),
                     'action_uuid': action['action_id'],
-                    'time': path_item["arrived_on"],
+                    'time': path_item_time,
                     'msg': action['msg'],
+                    'fields': {
+                        'rp_ispregnant': _format_str(c.fields.rp_ispregnant),
+                        'rp_state_number': _format_str(c.fields.rp_state_number),
+                        'rp_mun': _format_str(c.fields.rp_mun),
+                        'rp_atenmed': _format_str(c.fields.rp_atenmed),
+                        'rp_razonalerta': _format_str(c.fields.rp_razonalerta),
+                        'rp_razonbaja': _format_str(c.fields.rp_razonbaja),
+                        'contact_age': contact_age,
+                    },
+                    'baby_age': trimester_baby_age,
+                    'pregnant_week': week_pregnant,
+                    'responded': responded,
+                    'exit_type': exit_type,
+                    'is_one_way':is_one_way
                 }
                 r = Run(**run_dict)
-                r.meta.parent = run.contact.uuid
+                r.meta.parent = contact_uuid
                 r.save()
 
 
