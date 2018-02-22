@@ -47,7 +47,7 @@ def _aux_channel(flow_uuid, field, filter_date=[]):
     q = search_run(filter_date + [Q('term', flow_uuid=flow_uuid)])
     aggregate_by_razon(q, field=field)
     response = q.execute()
-    return response.aggregations
+    return format_aggs_result(response.aggregations[BYRAZON], 'reason')
 
 
 def _aux_number_by_channel(flow_uuid, field, filter_date=[]):
@@ -160,7 +160,6 @@ def number_sent_msgs_by_baby_age(filter_date=[]):
 ##########################################################################
 
 
-#cambiar por fields
 @date_decorator("time")
 def number_mialerta_by_group(filter_date=[]):
     result = {}
@@ -234,10 +233,13 @@ def number_mialerta_by_mom_age(filter_date=[]):
 
 @date_decorator("time")
 def number_mialerta_msgs_top(filter_date=[]):
-    q = search_run(filter_date + [Q('term', flow_uuid=flow_uuid)])
-    q = aggregate_by_razon(q, field=field)
+    q = search_run(filter_date + [
+        Q('term', flow_uuid='07d56699-9cfb-4dc6-805f-775989ff5b3f')
+    ])
+    aggregate_by_msg(q)
     response = q.execute()
-    return response.aggregations[BYRAZON]
+    return format_aggs_result(response.aggregations[BYMSG_STR].buckets,
+                              'message')
 
 
 ##########################################################################
@@ -371,7 +373,8 @@ def rate_completed_messages_by_state(filter_date=[]):
     aggregate_by_way(
         q.aggs[BYSTATE_STR].aggs[FILTERCOMPLETED_STR], single=False)
     response = q.execute()
-    return response.aggregations[BYSTATE_STR]
+    return format_rate_completed_messages(response.aggregations[BYSTATE_STR],
+                                          'state')
 
 
 #@date_decorator('time')
@@ -392,24 +395,25 @@ def rate_completed_messages_by_hospital(filter_date=[]):
     aggregate_by_way(
         q.aggs[BYHOSPITAL_STR].aggs[FILTERCOMPLETED_STR], single=False)
     response = q.execute()
-    return response.aggregations[BYHOSPITAL_STR]
+    return format_rate_completed_messages(
+        response.aggregations[BYHOSPITAL_STR], 'hospital')
 
 
 @date_decorator('time')
 def rate_completed_messages_by_message(filter_date=[]):
     q = search_run(filter_date)
-    q = aggregate_by_hospital(q)
-    filter_completed(q.aggs[BYHOSPITAL_STR])
-    aggregate_by_way(
-        q.aggs[BYHOSPITAL_STR].aggs[FILTERCOMPLETED_STR], single=False)
+    aggregate_by_msg(q)
+    filter_completed(q.aggs[BYMSG_STR])
+    aggregate_by_way(q.aggs[BYMSG_STR].aggs[FILTERCOMPLETED_STR], single=False)
     response = q.execute()
-    return response.aggregations[BYHOSPITAL_STR]
+    return format_rate_completed_messages(response.aggregations[BYMSG_STR],
+                                          'message')
 
 
 @date_decorator('time')
 def rate_completed_messages_by_mom_age(filter_date=[]):
     q = search_run(filter_date)
-    q = aggregate_by_mom_age_run(q)
+    aggregate_by_mom_age_run(q)
     filter_completed(q.aggs[BYMOMAGE_STR])
     aggregate_by_way(
         q.aggs[BYMOMAGE_STR].aggs[FILTERCOMPLETED_STR], single=False)
@@ -417,11 +421,11 @@ def rate_completed_messages_by_mom_age(filter_date=[]):
     return response.aggregations[BYMOMAGE_STR]
 
 
-@date_decorator('time')
-def rate_completed_messages_by_message(filter_date=[]):
-    q = search_run(filter_date)
-    q = aggregate_by_msg(q)
-    filter_completed(q.aggs[BYMSG_STR])
-    aggregate_by_way(q.aggs[BYMSG_STR].aggs[FILTERCOMPLETED_STR], single=False)
-    response = q.execute()
-    return response.aggregations[BYMSG_STR]
+#@date_decorator('time')
+#def rate_completed_messages_by_message(filter_date=[]):
+#    q = search_run(filter_date)
+#    q = aggregate_by_msg(q)
+#    filter_completed(q.aggs[BYMSG_STR])
+#    aggregate_by_way(q.aggs[BYMSG_STR].aggs[FILTERCOMPLETED_STR], single=False)
+#    response = q.execute()
+#    return response.aggregations[BYMSG_STR]

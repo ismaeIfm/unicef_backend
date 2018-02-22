@@ -249,17 +249,19 @@ def format_aggs_aggs_result(result, key_1, bucket_1, key_2, bucket_2):
     } for i in result.aggregations[bucket_1].buckets]
 
 
-def format_aggs_aggs_aggs_result(result, key_1, bucket_1, key_2, bucket_2,
-                                 key_3, bucket_3):
-    return [{
-        key_1:
-        i['key'],
-        'result': [{
-            key_2:
-            j['key'],
-            'result': [{
-                key_3: k['key'],
-                'count': k['doc_count']
-            } for k in j[bucket_3].buckets]
-        } for j in i[bucket_2].buckets]
-    } for i in result.aggregations[bucket_1].buckets]
+def format_rate_completed_messages(result, key):
+    formatted_result = []
+    for i in result:
+        total = i['doc_count']
+        runs_completed = {
+            j['key']: j['doc_count']
+            for j in i[FILTERCOMPLETED_STR][BYWAY_STR]
+        }
+        try:
+            rate = (runs_completed.get(0, 0) /
+                    (total - runs_completed.get(1, 0))) * 100
+        except ZeroDivisionError:
+            rate = 0
+
+        formatted_result.append({key: i['key'], 'rate': rate})
+    return formatted_result
