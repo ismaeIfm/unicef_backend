@@ -127,10 +127,11 @@ def number_sent_msgs_by_mom_age(filter_date=[]):
                   Q('match', fields__rp_ispregnant='0')
               ]))
     ])
-    aggregate_by_msg(q)
-    aggregate_by_mom_age_run(q.aggs[BYMSG_STR], single=False)
+    aggregate_by_mom_age_run(q)
+    aggregate_by_msg(q.aggs[BYMOMAGE_STR], single=False)
     response = q.execute()
-    return response.aggregations[BYMSG_STR].buckets
+    return format_aggs_result(response.aggregations[BYMOMAGE_STR].buckets,
+                              'age')
 
 
 @date_decorator('time')
@@ -418,7 +419,8 @@ def rate_completed_messages_by_mom_age(filter_date=[]):
     aggregate_by_way(
         q.aggs[BYMOMAGE_STR].aggs[FILTERCOMPLETED_STR], single=False)
     response = q.execute()
-    return response.aggregations[BYMOMAGE_STR]
+    return format_rate_completed_messages(response.aggregations[BYMOMAGE_STR],
+                                          'age')
 
 
 #@date_decorator('time')

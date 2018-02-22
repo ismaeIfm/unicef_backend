@@ -170,10 +170,11 @@ def aggregate_by_mom_age_run(q, single=True):
     groups = [{"from": 35}, {"from": 19, "to": 35}, {"from": 0, "to": 19}]
 
     if single:
-        a = A('range', field='contact_age', ranges=groups)
+        a = A('range', field='fields.contact_age', ranges=groups)
         q.aggs.bucket(BYMOMAGE_STR, a)
     else:
-        q.bucket(BYMOMAGE_STR, 'range', field='contact_age', ranges=groups)
+        q.bucket(
+            BYMOMAGE_STR, 'range', field='fields.contact_age', ranges=groups)
 
 
 def aggregate_by_baby_age(q, single=True):
