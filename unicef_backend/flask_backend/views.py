@@ -1345,8 +1345,8 @@ def view_msgs_by_baby_age(start_date, end_date):
 
 
 @api.route("/msgs_by_mun", methods=['POST', 'GET'])
-@use_kwargs(date_args)
-def view_msgs_by_mun(start_date, end_date):
+@use_kwargs(mun_args)
+def view_msgs_by_mun(state,start_date, end_date):
     """Mensajes enviados agrupados por municipio dado un estado
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
        Ambos parametros son opcionales
@@ -1374,7 +1374,7 @@ def view_msgs_by_mun(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = flows.number_sent_msgs_by_mun(
+    response = flows.number_sent_msgs_by_mun(state,
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
