@@ -1407,7 +1407,302 @@ def view_msgs_by_topic(start_date, end_date):
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
+################## Tasa de respuesta #########################
+@api.route("/rate_by_group", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_rate_by_group(start_date, end_date):
+    """Tasa de respuesta promedio por tipo de usuaria
+       El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
+       Ambos parametros son opcionales
+    ---
+    tags:
+      - Tasa de respuesta
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-1-20T00:00:00"
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = flows.rate_completed_messages_by_group(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
 
+
+@api.route("/rate_by_channel", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_rate_by_channel(start_date, end_date):
+    """Tasa de respuesta promedio por canal de comunicacion
+       El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
+       Ambos parametros son opcionales
+    ---
+    tags:
+      - Tasa de respuesta
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-1-20T00:00:00"
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = flows.rate_completed_messages_by_channel(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/rate_by_hospital", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_rate_by_hospital(start_date, end_date):
+    """Tasa de respuesta promedio por atencion medica
+       El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
+       Ambos parametros son opcionales
+    ---
+    tags:
+      -Tasa de respuesta
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-1-20T00:00:00"
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = flows.rate_completed_messages_by_hospital(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/rate_by_message", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_rate_by_message(start_date, end_date):
+    """Tasa de respuesta promedio por mensajes
+       El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
+       Ambos parametros son opcionales
+    ---
+    tags:
+      - Tasa de respuesta
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-1-20T00:00:00"
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = flows.rate_completed_messages_by_message(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/rate_by_mom_age", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_rate_by_mom_age(start_date, end_date):
+    """Tasa de respuesta promedio por edad de la mama
+       El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
+       Ambos parametros son opcionales
+    ---
+    tags:
+      - Tasa de respuesta
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-1-20T00:00:00"
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = flows.rate_completed_messages_by_mom_age(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+##################### Calidad medica ##########################
+@api.route("/calidad_medica_by_state", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_calidad_medica_by_state(start_date, end_date):
+    """Calidad medica por estado
+       El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
+       Ambos parametros son opcionales
+    ---
+    tags:
+      - Calidad medica
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-1-20T00:00:00"
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = contacts.get_calidad_medica_by_mun(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/calidad_medica_by_mun", methods=['POST', 'GET'])
+@use_kwargs(mun_args)
+def view_calidad_medica_by_mun(state, start_date, end_date):
+    """Calidad medica por municipio dado un estado
+       El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
+       Ambos parametros son opcionales
+    ---
+    tags:
+      - Calidad medica
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-1-20T00:00:00"
+      - name: state
+        in : query
+        description: Estado con el numero inegi
+        type: integer
+        default: 29
+        required: True
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = contacts.get_calidad_medica_by_mun(state,
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/calidad_medica_by_hospital", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_calidad_medica_by_hospital(start_date, end_date):
+    """Calidad medica por atencion medica
+       El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
+       Ambos parametros son opcionales
+    ---
+    tags:
+      - Calidad medica
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-1-20T00:00:00"
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = contacts.get_calidad_medica_by_hospital(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/calidad_medica_by_mom_age", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_calidad_medica_by_mom_age(start_date, end_date):
+    """Calidad medica por edad de la mama
+       El endpoint utiliza la fecha rp_duedate de los contactos para filtrar por temporalidad.
+       Ambos parametros son opcionales
+    ---
+    tags:
+      - Calidad medica
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-1-20T00:00:00"
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = contacts.get_calidad_medica_by_mom_age(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/calidad_medica_by_baby_age", methods=['POST', 'GET'])
+@use_kwargs(date_args)
+def view_calidad_medica_by_baby_age(start_date, end_date):
+    """Calidad medica por edad del bebe
+       El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
+       Ambos parametros son opcionales
+    ---
+    tags:
+      - Calidad medica
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-1-20T00:00:00"
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = contacts.get_calidad_medica_by_baby_age(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
 
 """
 curl -X POST \
