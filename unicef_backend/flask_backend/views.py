@@ -141,6 +141,7 @@ def view_users_by_mom_age(start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_contacts_by_mom_age(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -170,6 +171,7 @@ def view_users_by_baby_age(start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_contacts_by_baby_age(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -324,6 +326,7 @@ def view_babies_by_week(start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
+    start_date, end_date = configure_duedate(start_date, end_date)
     response = contacts.number_babies_by_week(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -353,6 +356,7 @@ def view_babies_by_mom_age(start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_babies_by_mom_age(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -443,7 +447,7 @@ def view_moms_by_state(start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
-    start_date, end_date = configure_duedate(start_date, end_date)
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_moms_by_state(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -502,6 +506,7 @@ def view_mom_age_by_state(start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_moms_by_state_age(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -531,6 +536,7 @@ def view_baby_age_by_state(start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_baby_age_by_state(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -732,6 +738,7 @@ def view_mom_age_by_mun(state, start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_baby_age_by_mun(
         state, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -767,6 +774,7 @@ def view_baby_age_by_mun(state, start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_baby_age_by_mun(
         state, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -837,6 +845,7 @@ def view_channel_by_mun(state, start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.number_channel_by_mun(
         state, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -1710,6 +1719,7 @@ def view_calidad_medica_by_mom_age(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
+    start_date, end_date = configure_duedate(start_date, end_date)
     response = contacts.get_calidad_medica_by_mom_age(
         "Calidad-Crecimuterino", start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
@@ -1739,6 +1749,7 @@ def view_calidad_medica_by_baby_age(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.get_calidad_medica_by_baby_age(
         "Calidad-Crecimuterino", start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
