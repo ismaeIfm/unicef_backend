@@ -38,7 +38,7 @@ def configure_duedate(start_date=None, end_date=None):
 
 
 ##################      Users part     ######################
-@api.route("/users_by_type", methods=['POST', 'GET'])
+@api.route("/users_by_type", methods=['GET'])
 def view_user_by_type():
     """Usuarios agrupados por tipo
        El endpoint sin filtro de temporalidad
@@ -53,7 +53,7 @@ def view_user_by_type():
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/users_by_state", methods=['POST', 'GET'])
+@api.route("/users_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_users_by_state(start_date, end_date):
     """Usuarios agrupados por municipio
@@ -82,7 +82,7 @@ def view_users_by_state(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/users_by_mun", methods=['POST', 'GET'])
+@api.route("/users_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_users_by_mun(state, start_date, end_date):
     """Usuarios agrupados por estado
@@ -117,7 +117,7 @@ def view_users_by_mun(state, start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/users_by_mom_age", methods=['POST', 'GET'])
+@api.route("/users_by_mom_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_users_by_mom_age(start_date, end_date):
     """Usuarios agrupados por edad de la madre cuando nacio su hijo
@@ -146,7 +146,7 @@ def view_users_by_mom_age(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/users_by_baby_age", methods=['POST', 'GET'])
+@api.route("/users_by_baby_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_users_by_baby_age(start_date, end_date):
     """Usuarios agrupados por edad del bebe
@@ -170,11 +170,12 @@ def view_users_by_baby_age(start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.number_contacts_by_baby_age(start_date=start_date, end_date=end_date)
+    response = contacts.number_contacts_by_baby_age(
+        start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/users_by_hospital", methods=['POST', 'GET'])
+@api.route("/users_by_hospital", methods=['GET'])
 @use_kwargs(date_args)
 def view_users_by_hospital(start_date, end_date):
     """Usuarios agrupados por tipo de atencion medica
@@ -203,7 +204,7 @@ def view_users_by_hospital(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/users_by_channel", methods=['POST', 'GET'])
+@api.route("/users_by_channel", methods=['GET'])
 @use_kwargs(date_args)
 def view_users_by_channel(start_date, end_date):
     """Usuarios agrupados por canal de comunicacion
@@ -233,7 +234,7 @@ def view_users_by_channel(start_date, end_date):
 
 
 ##################      Babies part     ######################
-@api.route("/babies_by_state", methods=['POST', 'GET'])
+@api.route("/babies_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_babies_by_state(start_date, end_date):
     """Bebes agrupados por estado
@@ -263,7 +264,7 @@ def view_babies_by_state(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/babies_by_mun", methods=['POST', 'GET'])
+@api.route("/babies_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_babies_by_mun(state, start_date, end_date):
     """Bebes agrupados por municipio dado un estado
@@ -299,7 +300,36 @@ def view_babies_by_mun(state, start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/babies_by_mom_age", methods=['POST', 'GET'])
+@api.route("/babies_by_week", methods=['GET'])
+@use_kwargs(date_args)
+def view_babies_by_week(start_date, end_date):
+    """Bebes agrupados por la semana de gestacion al nacer.
+       El endpoint utiliza la fecha rp_duedate de los contactos para filtrar por temporalidad.
+       Ambos parametros son opcionales.
+    ---
+    tags:
+      - Numero de bebes
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-1-20T00:00:00"
+    responses:
+      200:
+        description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = contacts.number_babies_by_week(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
+@api.route("/babies_by_mom_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_babies_by_mom_age(start_date, end_date):
     """Bebes agrupados por la edad de la mama cuando tuvieron al hijo.
@@ -328,7 +358,7 @@ def view_babies_by_mom_age(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/babies_by_hospital", methods=['POST', 'GET'])
+@api.route("/babies_by_hospital", methods=['GET'])
 @use_kwargs(date_args)
 def view_babies_by_hospital(start_date, end_date):
     """Bebes agrupados por el lugar de atencion medica
@@ -359,7 +389,7 @@ def view_babies_by_hospital(start_date, end_date):
 
 
 ##################      States part     ######################
-@api.route("/pregnants_by_state", methods=['POST', 'GET'])
+@api.route("/pregnants_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_pregnants_by_state(start_date, end_date):
     """Mujeres embarazadas por estado
@@ -389,7 +419,7 @@ def view_pregnants_by_state(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/moms_by_state", methods=['POST', 'GET'])
+@api.route("/moms_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_moms_by_state(start_date, end_date):
     """Madres por estado
@@ -419,7 +449,7 @@ def view_moms_by_state(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/personal_by_state", methods=['POST', 'GET'])
+@api.route("/personal_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_personal_by_state(start_date, end_date):
     """Personal por estado
@@ -448,7 +478,7 @@ def view_personal_by_state(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/mom_age_by_state", methods=['POST', 'GET'])
+@api.route("/mom_age_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_mom_age_by_state(start_date, end_date):
     """Madres agrupadas por estado y por edad
@@ -477,7 +507,7 @@ def view_mom_age_by_state(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/baby_age_by_state", methods=['POST', 'GET'])
+@api.route("/baby_age_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_baby_age_by_state(start_date, end_date):
     """Bebes agrupados por estado y por edad
@@ -501,11 +531,12 @@ def view_baby_age_by_state(start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.number_baby_age_by_state(start_date=start_date, end_date=end_date)
+    response = contacts.number_baby_age_by_state(
+        start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/hospitals_by_state", methods=['POST', 'GET'])
+@api.route("/hospitals_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_hospitals_by_state(start_date, end_date):
     """Usuarios agrupados por estado y lugar de atencion medica
@@ -534,7 +565,7 @@ def view_hospitals_by_state(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/channel_by_state", methods=['POST', 'GET'])
+@api.route("/channel_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_channel_by_state(start_date, end_date):
     """Usuarios agrupados por estado y canal de comunicacion
@@ -564,7 +595,7 @@ def view_channel_by_state(start_date, end_date):
 
 
 ##################      Municipios part     ######################
-@api.route("/pregnants_by_mun", methods=['POST', 'GET'])
+@api.route("/pregnants_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_pregnants_by_mun(state, start_date, end_date):
     """Mujeres embarazadas agrupados por municipio dado un estado
@@ -600,7 +631,7 @@ def view_pregnants_by_mun(state, start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/moms_by_mun", methods=['POST', 'GET'])
+@api.route("/moms_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_moms_by_mun(state, start_date, end_date):
     """Madres agrupados por municipio dado un estado
@@ -636,7 +667,7 @@ def view_moms_by_mun(state, start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/personal_by_mun", methods=['POST', 'GET'])
+@api.route("/personal_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_personal_by_mun(state, start_date, end_date):
     """Personal agrupados por municipio dado un estado
@@ -671,7 +702,7 @@ def view_personal_by_mun(state, start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/mom_age_by_mun", methods=['POST', 'GET'])
+@api.route("/mom_age_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_mom_age_by_mun(state, start_date, end_date):
     """Madres agrupadas por municipio dado un estado y agrupadas por edad
@@ -701,11 +732,12 @@ def view_mom_age_by_mun(state, start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.number_baby_age_by_mun(state,start_date=start_date, end_date=end_date)
+    response = contacts.number_baby_age_by_mun(
+        state, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/baby_age_by_mun", methods=['POST', 'GET'])
+@api.route("/baby_age_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_baby_age_by_mun(state, start_date, end_date):
     """Bebes agrupados por municipio dado un estado y agrupados por edad
@@ -735,11 +767,12 @@ def view_baby_age_by_mun(state, start_date, end_date):
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.number_baby_age_by_mun(state, start_date=start_date, end_date=end_date)
+    response = contacts.number_baby_age_by_mun(
+        state, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/hospitals_by_mun", methods=['POST', 'GET'])
+@api.route("/hospitals_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_hospitals_by_mun(state, start_date, end_date):
     """Usuarios por municipio dado un estado y por atencion medica
@@ -774,7 +807,7 @@ def view_hospitals_by_mun(state, start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/channel_by_mun", methods=['POST', 'GET'])
+@api.route("/channel_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_channel_by_mun(state, start_date, end_date):
     """Usuarios  agrupados por canal de comunicacion y  agrupados por municipio dado un estado
@@ -810,7 +843,7 @@ def view_channel_by_mun(state, start_date, end_date):
 
 
 ##################      Mialerta part     ######################
-@api.route("/mialerta_by_group", methods=['POST', 'GET'])
+@api.route("/mialerta_by_group", methods=['GET'])
 @use_kwargs(date_args)
 def view_mialerta_by_group(start_date, end_date):
     """Detonaciones de mialerta agrupados por grupo
@@ -839,7 +872,7 @@ def view_mialerta_by_group(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/mialerta_by_state", methods=['POST', 'GET'])
+@api.route("/mialerta_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_mialerta_by_state(start_date, end_date):
     """Detonaciones de mialerta agrupados por estado
@@ -868,7 +901,7 @@ def view_mialerta_by_state(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/mialerta_by_mom_age", methods=['POST', 'GET'])
+@api.route("/mialerta_by_mom_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_mialerta_by_mom_age(start_date, end_date):
     """Detonaciones de mialerta agrupados la edad de la mama
@@ -897,7 +930,7 @@ def view_mialerta_by_mom_age(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/mialerta_by_baby_age", methods=['POST', 'GET'])
+@api.route("/mialerta_by_baby_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_mialerta_by_baby_age(start_date, end_date):
     """Detonaciones de mialerta agrupados la edad del bebe
@@ -926,7 +959,7 @@ def view_mialerta_by_baby_age(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/mialerta_by_mun", methods=['POST', 'GET'])
+@api.route("/mialerta_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_mialerta_by_mun(state, start_date, end_date):
     """Detonaciones de mialerta agrupados por municipio dado un estado
@@ -961,7 +994,7 @@ def view_mialerta_by_mun(state, start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/mialerta_by_hospital", methods=['POST', 'GET'])
+@api.route("/mialerta_by_hospital", methods=['GET'])
 @use_kwargs(date_args)
 def view_mialerta_by_hospital(start_date, end_date):
     """Detonaciones de mialerta agrupados por atencion medica
@@ -990,7 +1023,7 @@ def view_mialerta_by_hospital(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/mialerta_by_channel", methods=['POST', 'GET'])
+@api.route("/mialerta_by_channel", methods=['GET'])
 @use_kwargs(date_args)
 def view_mialerta_by_channel(start_date, end_date):
     """Detonaciones de mialerta agrupados por canal de comunicacion
@@ -1019,7 +1052,7 @@ def view_mialerta_by_channel(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/mialerta_msgs", methods=['POST', 'GET'])
+@api.route("/mialerta_msgs", methods=['GET'])
 @use_kwargs(date_args)
 def view_mialerta_msgs(start_date, end_date):
     """Top de razones de mialerta
@@ -1049,7 +1082,7 @@ def view_mialerta_msgs(start_date, end_date):
 
 
 ##################      cancela part     ######################
-@api.route("/cancela_by_group", methods=['POST', 'GET'])
+@api.route("/cancela_by_group", methods=['GET'])
 @use_kwargs(date_args)
 def view_cancela_by_group(start_date, end_date):
     """Detonaciones de cancela agrupados tipo de contacto
@@ -1078,7 +1111,7 @@ def view_cancela_by_group(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/cancela_by_state", methods=['POST', 'GET'])
+@api.route("/cancela_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_cancela_by_state(start_date, end_date):
     """Detonaciones de cancela agrupados por estado
@@ -1107,7 +1140,7 @@ def view_cancela_by_state(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/cancela_by_mun", methods=['POST', 'GET'])
+@api.route("/cancela_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_cancela_by_mun(state, start_date, end_date):
     """Detonaciones de cancela agrupados por municipio
@@ -1142,7 +1175,7 @@ def view_cancela_by_mun(state, start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/cancela_by_hospital", methods=['POST', 'GET'])
+@api.route("/cancela_by_hospital", methods=['GET'])
 @use_kwargs(date_args)
 def view_cancela_by_hospital(start_date, end_date):
     """Detonaciones de cancela agrupados por atencion medica
@@ -1171,7 +1204,7 @@ def view_cancela_by_hospital(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/cancela_by_mom_age", methods=['POST', 'GET'])
+@api.route("/cancela_by_mom_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_cancela_by_mom_age(start_date, end_date):
     """Detonaciones de cancela agrupados por la edad de la mama
@@ -1200,7 +1233,7 @@ def view_cancela_by_mom_age(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/cancela_by_baby_age", methods=['POST', 'GET'])
+@api.route("/cancela_by_baby_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_cancela_by_baby_age(start_date, end_date):
     """Detonaciones de cancela agrupados por la edad del bebe
@@ -1228,7 +1261,8 @@ def view_cancela_by_baby_age(start_date, end_date):
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
-@api.route("/cancela_by_channel", methods=['POST', 'GET'])
+
+@api.route("/cancela_by_channel", methods=['GET'])
 @use_kwargs(date_args)
 def view_cancela_by_channel(start_date, end_date):
     """Detonaciones de cancela agrupados por canal de comunicacion
@@ -1256,8 +1290,9 @@ def view_cancela_by_channel(start_date, end_date):
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
+
 ##################      msgs part     ######################
-@api.route("/msgs_by_state", methods=['POST', 'GET'])
+@api.route("/msgs_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_msgs_by_state(start_date, end_date):
     """Mensajes enviados por estado
@@ -1286,7 +1321,7 @@ def view_msgs_by_state(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/msgs_by_mom_age", methods=['POST', 'GET'])
+@api.route("/msgs_by_mom_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_msgs_by_mom_age(start_date, end_date):
     """Mensajes enviados agrupados por la edad de la mama
@@ -1315,7 +1350,7 @@ def view_msgs_by_mom_age(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/msgs_by_baby_age", methods=['POST', 'GET'])
+@api.route("/msgs_by_baby_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_msgs_by_baby_age(start_date, end_date):
     """Mensajes enviados agrupados por la edad del bebe
@@ -1344,9 +1379,9 @@ def view_msgs_by_baby_age(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/msgs_by_mun", methods=['POST', 'GET'])
+@api.route("/msgs_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
-def view_msgs_by_mun(state,start_date, end_date):
+def view_msgs_by_mun(state, start_date, end_date):
     """Mensajes enviados agrupados por municipio dado un estado
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
        Ambos parametros son opcionales
@@ -1374,12 +1409,12 @@ def view_msgs_by_mun(state,start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = flows.number_sent_msgs_by_mun(state,
-        start_date=start_date, end_date=end_date)
+    response = flows.number_sent_msgs_by_mun(
+        state, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/msgs_by_topic", methods=['POST', 'GET'])
+@api.route("/msgs_by_topic", methods=['GET'])
 @use_kwargs(date_args)
 def view_msgs_by_topic(start_date, end_date):
     """Mensajes enviados agrupados por tema del mensaje
@@ -1407,8 +1442,9 @@ def view_msgs_by_topic(start_date, end_date):
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
+
 ################## Tasa de respuesta #########################
-@api.route("/rate_by_group", methods=['POST', 'GET'])
+@api.route("/rate_by_group", methods=['GET'])
 @use_kwargs(date_args)
 def view_rate_by_group(start_date, end_date):
     """Tasa de respuesta promedio por tipo de usuaria
@@ -1437,7 +1473,7 @@ def view_rate_by_group(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/rate_by_channel", methods=['POST', 'GET'])
+@api.route("/rate_by_channel", methods=['GET'])
 @use_kwargs(date_args)
 def view_rate_by_channel(start_date, end_date):
     """Tasa de respuesta promedio por canal de comunicacion
@@ -1466,7 +1502,7 @@ def view_rate_by_channel(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/rate_by_hospital", methods=['POST', 'GET'])
+@api.route("/rate_by_hospital", methods=['GET'])
 @use_kwargs(date_args)
 def view_rate_by_hospital(start_date, end_date):
     """Tasa de respuesta promedio por atencion medica
@@ -1495,7 +1531,7 @@ def view_rate_by_hospital(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/rate_by_message", methods=['POST', 'GET'])
+@api.route("/rate_by_message", methods=['GET'])
 @use_kwargs(date_args)
 def view_rate_by_message(start_date, end_date):
     """Tasa de respuesta promedio por mensajes
@@ -1524,7 +1560,7 @@ def view_rate_by_message(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/rate_by_mom_age", methods=['POST', 'GET'])
+@api.route("/rate_by_mom_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_rate_by_mom_age(start_date, end_date):
     """Tasa de respuesta promedio por edad de la mama
@@ -1554,7 +1590,7 @@ def view_rate_by_mom_age(start_date, end_date):
 
 
 ##################### Calidad medica ##########################
-@api.route("/calidad_medica_by_state", methods=['POST', 'GET'])
+@api.route("/calidad_medica_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_calidad_medica_by_state(start_date, end_date):
     """Calidad medica por estado
@@ -1578,12 +1614,12 @@ def view_calidad_medica_by_state(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.get_calidad_medica_by_state("Calidad-Crecimuterino",
-        start_date=start_date, end_date=end_date)
+    response = contacts.get_calidad_medica_by_state(
+        "Calidad-Crecimuterino", start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/calidad_medica_by_mun", methods=['POST', 'GET'])
+@api.route("/calidad_medica_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_calidad_medica_by_mun(state, start_date, end_date):
     """Calidad medica por municipio dado un estado
@@ -1613,12 +1649,15 @@ def view_calidad_medica_by_mun(state, start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.get_calidad_medica_by_mun(state, "Calidad-Crecimuterino",
-        start_date=start_date, end_date=end_date)
+    response = contacts.get_calidad_medica_by_mun(
+        state,
+        "Calidad-Crecimuterino",
+        start_date=start_date,
+        end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/calidad_medica_by_hospital", methods=['POST', 'GET'])
+@api.route("/calidad_medica_by_hospital", methods=['GET'])
 @use_kwargs(date_args)
 def view_calidad_medica_by_hospital(start_date, end_date):
     """Calidad medica por atencion medica
@@ -1642,12 +1681,12 @@ def view_calidad_medica_by_hospital(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.get_calidad_medica_by_hospital("Calidad-Crecimuterino",
-        start_date=start_date, end_date=end_date)
+    response = contacts.get_calidad_medica_by_hospital(
+        "Calidad-Crecimuterino", start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/calidad_medica_by_mom_age", methods=['POST', 'GET'])
+@api.route("/calidad_medica_by_mom_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_calidad_medica_by_mom_age(start_date, end_date):
     """Calidad medica por edad de la mama
@@ -1671,12 +1710,12 @@ def view_calidad_medica_by_mom_age(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.get_calidad_medica_by_mom_age("Calidad-Crecimuterino",
-        start_date=start_date, end_date=end_date)
+    response = contacts.get_calidad_medica_by_mom_age(
+        "Calidad-Crecimuterino", start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/calidad_medica_by_baby_age", methods=['POST', 'GET'])
+@api.route("/calidad_medica_by_baby_age", methods=['GET'])
 @use_kwargs(date_args)
 def view_calidad_medica_by_baby_age(start_date, end_date):
     """Calidad medica por edad del bebe
@@ -1700,9 +1739,10 @@ def view_calidad_medica_by_baby_age(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.get_calidad_medica_by_baby_age("Calidad-Crecimuterino",
-        start_date=start_date, end_date=end_date)
+    response = contacts.get_calidad_medica_by_baby_age(
+        "Calidad-Crecimuterino", start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
+
 
 """
 curl -X POST \

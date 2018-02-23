@@ -66,6 +66,16 @@ def number_contacts_by_mom_age(filter_date=[], query=[]):
                               'group')
 
 
+@date_decorator('rp_duedate')
+def number_contacts_by_pregnant_weeks(filter_date=[], query=[]):
+    q = search_contact(query + filter_date +
+                       [Q('exists', field='fields.rp_duedate')])
+    aggregate_per_week_pregnant(q)
+    response = q.execute()
+    return format_aggs_result(response.aggregations[BYWEEKPREGNAT_STR].buckets,
+                              'group')
+
+
 @date_decorator('rp_deliverydate')
 def number_contacts_by_baby_age(query=[], filter_date=[]):
     q = search_contact(query)
@@ -130,6 +140,12 @@ def number_babies_by_mom_age(query=[], filter_date=[]):
 def number_babies_by_hospital(filter_date=[], query=[]):
     return number_contacts_by_hospital(
         query=filter_date + query + [Q('term', fields__rp_ispregnant='0')])
+
+
+@date_decorator('rp_duedate')
+def number_babies_by_week(filter_date=[]):
+    return number_contacts_by_pregnant_weeks(
+        query=filter_date + [Q('term', fields__rp_ispregnant='0')])
 
 
 #@date_decorator('rp_deliverydate')
@@ -390,7 +406,7 @@ def get_calidad_medica_by_baby_age(calidad_field, filter_date=[]):
 
 
 @date_decorator('created_on')
-def ge_calidad_medica_by_hospital(calidad_field, filter_date=[]):
+def get_calidad_medica_by_pregnant_weeks(calidad_field, filter_date=[]):
     q = search_contact(filter_date + [Q('exists', field='uuid')])
     aggregate_per_week_pregnant(q)
     aggregate_by_calidad(q.aggs[BYWEEKPREGNAT_STR], calidad_field)
