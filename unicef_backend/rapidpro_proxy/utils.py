@@ -247,7 +247,7 @@ def format_aggs_aggs_result(result, key_1, bucket_1, key_2, bucket_2):
             key_2: j['key'],
             'count': j['doc_count']
         } for j in i[bucket_2].buckets]
-    } for i in result.aggregations[bucket_1].buckets]
+    } for i in result.aggregations[bucket_1].buckets if i[bucket_2].buckets]
 
 
 def format_rate_completed_messages(result, key):
