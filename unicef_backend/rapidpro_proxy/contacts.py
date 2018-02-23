@@ -78,7 +78,7 @@ def number_contacts_by_pregnant_weeks(filter_date=[], query=[]):
 
 @date_decorator('rp_deliverydate')
 def number_contacts_by_baby_age(query=[], filter_date=[]):
-    q = search_contact(query)
+    q = search_contact(query + filter_date)
     aggregate_by_baby_age(q)
     response = q.execute()
 
