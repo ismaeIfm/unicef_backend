@@ -192,7 +192,7 @@ def number_moms_by_state_age(filter_date=[]):
 @date_decorator('rp_deliverydate')
 def number_baby_age_by_state(filter_date=[]):
 
-    q = search_contact()
+    q = search_contact(filter_date)
     aggregate_by_state(q)
     aggregate_by_baby_age(q.aggs[BYSTATE_STR], single=False)
     response = q.execute()
