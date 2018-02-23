@@ -1474,7 +1474,7 @@ def view_rate_by_hospital(start_date, end_date):
        Ambos parametros son opcionales
     ---
     tags:
-      -Tasa de respuesta
+      - Tasa de respuesta
     parameters:
       - name: start_date
         in: query
@@ -1578,7 +1578,7 @@ def view_calidad_medica_by_state(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.get_calidad_medica_by_mun(
+    response = contacts.get_calidad_medica_by_state("Calidad-Crecimuterino",
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
@@ -1613,7 +1613,7 @@ def view_calidad_medica_by_mun(state, start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.get_calidad_medica_by_mun(state,
+    response = contacts.get_calidad_medica_by_mun(state, "Calidad-Crecimuterino",
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
@@ -1642,7 +1642,7 @@ def view_calidad_medica_by_hospital(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.get_calidad_medica_by_hospital(
+    response = contacts.get_calidad_medica_by_hospital("Calidad-Crecimuterino",
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
@@ -1671,7 +1671,7 @@ def view_calidad_medica_by_mom_age(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.get_calidad_medica_by_mom_age(
+    response = contacts.get_calidad_medica_by_mom_age("Calidad-Crecimuterino",
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
@@ -1700,7 +1700,7 @@ def view_calidad_medica_by_baby_age(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.get_calidad_medica_by_baby_age(
+    response = contacts.get_calidad_medica_by_baby_age("Calidad-Crecimuterino",
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
