@@ -16,7 +16,7 @@ date_args = {
     'end_date': fields.DateTime(missing=None)
 }
 
-mun_args = {'state': fields.Integer(required=True)}
+mun_args = {'state': fields.Str(required=True)}
 mun_args.update(date_args)
 
 
@@ -105,7 +105,7 @@ def view_users_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -287,7 +287,7 @@ def view_babies_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -618,7 +618,7 @@ def view_pregnants_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -654,7 +654,7 @@ def view_moms_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -690,7 +690,7 @@ def view_personal_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -725,7 +725,7 @@ def view_mom_age_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -760,7 +760,7 @@ def view_baby_age_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -795,7 +795,7 @@ def view_hospitals_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -830,7 +830,7 @@ def view_channel_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -982,7 +982,7 @@ def view_mialerta_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -1163,7 +1163,7 @@ def view_cancela_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -1402,7 +1402,7 @@ def view_msgs_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
@@ -1642,7 +1642,7 @@ def view_calidad_medica_by_mun(state, start_date, end_date):
       - name: state
         in : query
         description: Estado con el numero inegi
-        type: integer
+        type: string
         default: 29
         required: True
     responses:
