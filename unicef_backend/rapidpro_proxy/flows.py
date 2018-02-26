@@ -76,7 +76,8 @@ def _aux_number_by_mom_age(flow_uuid, field, filter_date=[]):
     aggregate_by_razon(q.aggs[BYMOMAGE_STR], field, single=False)
     response = q.execute()
 
-    return response.aggregations[BYMOMAGE_STR].buckets
+    return format_aggs_aggs_result(response, 'group', BYMOMAGE_STR, 'reason',
+                                   BYRAZON)
 
 
 def _aux_by_group(query, flow_uuid, field, filter_date=[]):
@@ -234,9 +235,9 @@ def number_mialerta_by_mom_age(filter_date=[]):
 
 @date_decorator("time")
 def number_mialerta_msgs_top(filter_date=[]):
-    q = search_run(filter_date + [
-        Q('term', flow_uuid='07d56699-9cfb-4dc6-805f-775989ff5b3f')
-    ])
+    q = search_run(
+        filter_date +
+        [Q('term', flow_uuid='07d56699-9cfb-4dc6-805f-775989ff5b3f')])
     aggregate_by_msg(q)
     response = q.execute()
     return format_aggs_result(response.aggregations[BYMSG_STR].buckets,
