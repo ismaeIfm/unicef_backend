@@ -739,7 +739,7 @@ def view_mom_age_by_mun(state, start_date, end_date):
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
     """
     start_date, end_date = configure_deliverydate(start_date, end_date)
-    response = contacts.number_baby_age_by_mun(
+    response = contacts.number_moms_by_mun_age(
         state, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
