@@ -42,6 +42,11 @@ CONTACT_FIELDS = {
 
 def insert_one_contact(c):
     fields = {k: v(c.fields.get(k, '')) for k, v in CONTACT_FIELDS.items()}
+    ###### Check if is baby to add pregnant_week
+    week_birth = None
+    if c.fields["rp_deliverydate"]:
+        #Then check week of birth
+        week_birth = _get_difference_dates(c.fields["rp_duedate"], c.fields["rp_deliverydate"],'w')
     groups = [{'uuid': i.uuid, 'name': i.name} for i in c.groups]
     contact = {
         '_id': c.uuid,
@@ -56,6 +61,8 @@ def insert_one_contact(c):
         'stopped': c.stopped,
         'blocked': c.blocked
     }
+    if week_birth:
+        contact["pregnant_week"] = 40-week_birth
     cs = Contact(**contact)
     cs.save()
     return cs
@@ -101,7 +108,6 @@ def insert_run(run, path_item, action, c):
     week_pregnant, trimester_baby_age = None, None
     if pregnant_difference and pregnant_difference <= 40:
         week_pregnant = 40 - pregnant_difference if pregnant_difference <= 40 else 41
-        c.update_week(week_pregnant)
     if baby_age and baby_age >= 0 and baby_age <= 24:
         trimester_baby_age = baby_age // 3
         c.update_baby_age(trimester_baby_age)
@@ -223,7 +229,6 @@ def load_runs_from_csv(force=False):
                 week_pregnant, trimester_baby_age = None, None
                 if pregnant_difference and pregnant_difference <= 40:
                     week_pregnant = 40 - pregnant_difference if pregnant_difference <= 40 else 41
-                    c.update_week(week_pregnant)
                 if baby_age and baby_age >= 0 and baby_age <= 24:
                     trimester_baby_age = baby_age // 3
                     c.update_baby_age(trimester_baby_age)
