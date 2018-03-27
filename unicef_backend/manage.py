@@ -44,9 +44,18 @@ def insert_one_contact(c):
     fields = {k: v(c.fields.get(k, '')) for k, v in CONTACT_FIELDS.items()}
     ###### Check if is baby to add pregnant_week
     week_birth = None
-    if c.fields["rp_deliverydate"]:
-        #Then check week of birth
-        week_birth = _get_difference_dates(c.fields["rp_duedate"], c.fields["rp_deliverydate"],'w')
+    if c.fields["rp_deliverydate"] and c.fields["rp_deliverydate"] != 'NULL':
+        if not c.fields["rp_duedate"]:  # Then we dont have idea of pregnant week
+            week_birth = 0
+        else:
+            try:
+                duedate = c.fields["rp_duedate"][:-1] if c.fields["rp_duedate"][-1]=="." else c.fields["rp_duedate"]
+                delivery = c.fields["rp_deliverydate"][:-1] if c.fields["rp_deliverydate"][-1]=="." else c.fields["rp_deliverydate"]
+                week_birth = _get_difference_dates(
+                    parse(duedate),
+                    parse(delivery), 'w')
+            except ValueError:
+                pass
     groups = [{'uuid': i.uuid, 'name': i.name} for i in c.groups]
     contact = {
         '_id': c.uuid,
@@ -62,7 +71,8 @@ def insert_one_contact(c):
         'blocked': c.blocked
     }
     if week_birth:
-        contact["pregnant_week"] = 40-week_birth
+        week_birth = 0 if week_birth <= 0 else week_birth
+        contact["pregnant_week"] = 40 - week_birth
     cs = Contact(**contact)
     cs.save()
     return cs
@@ -276,7 +286,7 @@ def load_flows():
 @manager.command
 def download_contacts(force=False):
     date = (datetime.utcnow() - timedelta(minutes=30)).isoformat()
-    contacts = mx_client.get_contacts(after=date).all()
+    contacts = mx_client.get_contacts(group="ALL").all()
     for c in tqdm(contacts, desc='==> Getting Contacts'):
         #Only save misalud contacts
         if not "MIGRACION_PD" in [i.name for i in c.groups]:
