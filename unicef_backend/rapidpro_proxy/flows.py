@@ -379,14 +379,15 @@ def rate_completed_messages_by_state(filter_date=[]):
                                           'state')
 
 
-#@date_decorator('time')
-#def rate_completed_messages_by_mun(state, filter_date=[]):
-#    q = search_run(filter_date + [Q('term', fields__rp_state_number=state)])
-#    aggregate_by_mun(q)
-#    filter_completed(q.aggs[BYMUN_STR])
-#    aggregate_by_way(q.aggs[BYMUN_STR].aggs[FILTERCOMPLETED_STR], single=False)
-#    response = q.execute()
-#    return response.aggregations[BYMUN_STR]
+@date_decorator('time')
+def rate_completed_messages_by_mun(state, filter_date=[]):
+    q = search_run(filter_date + [Q('term', fields__rp_state_number=state)])
+    aggregate_by_mun(q)
+    filter_completed(q.aggs[BYMUN_STR])
+    aggregate_by_way(q.aggs[BYMUN_STR].aggs[FILTERCOMPLETED_STR], single=False)
+    response = q.execute()
+    return format_rate_completed_messages(response.aggregations[BYMUN_STR],
+                                          'mun')
 
 
 @date_decorator('time')
