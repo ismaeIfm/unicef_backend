@@ -44,7 +44,7 @@ def parse_date_from_rp(field):
         return ""
     date_rp = field[:-1] if field[-1]=="." else field
     try:
-        parse_date = parse(date_rp)
+        parse_date = parse(parse(date_rp).strftime("%d-%m-%Y"))
     except ValueError:
         parse_date = ""
     return parse_date
