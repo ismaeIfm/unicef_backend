@@ -39,23 +39,35 @@ CONTACT_FIELDS = {
     'calidad_vacunas': _format_str
 }
 
+def parse_date_from_rp(field):
+    if not field:
+        return ""
+    date_rp = field[:-1] if field[-1]=="." else field
+    try:
+        parse_date = parse(date_rp)
+    except ValueError:
+        parse_date = ""
+    return parse_date
 
 def insert_one_contact(c):
     fields = {k: v(c.fields.get(k, '')) for k, v in CONTACT_FIELDS.items()}
     ###### Check if is baby to add pregnant_week
     week_birth = None
+    ####################        BABY CONTACT        ############################
     if c.fields["rp_deliverydate"] and c.fields["rp_deliverydate"] != 'NULL':
         if not c.fields["rp_duedate"]:  # Then we dont have idea of pregnant week
             week_birth = 0
         else:
             try:
-                duedate = c.fields["rp_duedate"][:-1] if c.fields["rp_duedate"][-1]=="." else c.fields["rp_duedate"]
-                delivery = c.fields["rp_deliverydate"][:-1] if c.fields["rp_deliverydate"][-1]=="." else c.fields["rp_deliverydate"]
+                duedate  = parse_date_from_rp(c.fields["rp_duedate"])
+                delivery = parse_date_from_rp(c.fields["rp_deliverydate"])
                 week_birth = _get_difference_dates(
-                    parse(duedate),
-                    parse(delivery), 'w')
+                    duedate,
+                    delivery, 'w')
             except ValueError:
                 pass
+    ##################       ALWAYS PARSE DATES ################################
+    c.fields["rp_mamafechanac"] = parse_date_from_rp(c.fields["rp_mamafechanac"])
     groups = [{'uuid': i.uuid, 'name': i.name} for i in c.groups]
     contact = {
         '_id': c.uuid,
@@ -285,7 +297,6 @@ def load_flows():
 
 @manager.command
 def download_contacts(force=False):
-    date = (datetime.utcnow() - timedelta(minutes=30)).isoformat()
     contacts = mx_client.get_contacts(group="ALL").all()
     for c in tqdm(contacts, desc='==> Getting Contacts'):
         #Only save misalud contacts
