@@ -141,11 +141,20 @@ def aggregate_by_hospital(q, single=True):
             field='fields.rp_atenmed',
             size=2147483647)
 
+def auxiliar_contacts_by_mom(q, is_pregnant):
+    total_mom = q.count()
+    aggregate_by_mom_age(q, is_pregnant=is_pregnant)
+    response = q[0:total_mom].execute()
+    return format_aggs_result(response.aggregations[BYMOMAGE_STR].buckets,
+                              'group')
 
-def aggregate_by_mom_age(q, single=True, duedate=True):
+
+
+
+def aggregate_by_mom_age(q, single=True, is_pregnant=True):
     groups = [{"from": 35}, {"from": 19, "to": 35}, {"from": 0, "to": 19}]
 
-    duedate_str = "doc['fields.rp_duedate'].value" if duedate else "doc['fields.rp_deliverydate'].value"
+    duedate_str = "doc['fields.rp_duedate'].value" if is_pregnant else "doc['fields.rp_deliverydate'].value"
 
     mombirth_str = "doc['fields.rp_mamafechanac'].value"
     milliseconds2years_str = "/ 1000 / 60 / 60 / 24 / 365"
