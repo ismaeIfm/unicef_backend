@@ -12,13 +12,14 @@ sys.path.insert(0, '..')
 def number_contacts_by_group(filter_date=[]):
 
     q = search_contact(filter_date +
-                       [Q('match', group__name='PERSONAL_SALUD')])
+                       [Q('regexp', groups__name='PERSONAL_SALUD[^ ]*')])
     personal_contacts = q.count()
 
-    q = search_contact(filter_date + [Q('match', fields__rp_ispregnant='1')])
+    q = search_contact(filter_date + [Q('regexp', groups__name="PREGNANT[^ ]*"), Q('match', fields__rp_ispregnant='1')])
     pregnant_contacts = q.count()
 
-    q = search_contact(filter_date + [Q('match', fields__rp_ispregnant='0')])
+    q = search_contact(filter_date + [Q('regexp', groups__name='PUERPERIUM[^ ]*'),
+                            Q('match', fields__rp_ispregnant='0')])
     baby_contacts = q.count()
 
     groups = {
@@ -56,14 +57,22 @@ def number_contacts_by_mun(state, filter_date=[], query=[]):
 
 @date_decorator('rp_deliverydate')
 def number_contacts_by_mom_age(filter_date=[], query=[]):
-    q = search_contact(query + filter_date + [
+    q_pregnant = search_contact(query + filter_date + [
         Q('exists', field='fields.rp_mamafechanac'),
-        Q('exists', field='fields.rp_duedate')
+        Q('regexp', groups__name='PREGNANT[^ ]*')
     ])
-    aggregate_by_mom_age(q)
-    response = q.execute()
-    return format_aggs_result(response.aggregations[BYMOMAGE_STR].buckets,
-                              'group')
+    q_puerperium = search_contact(query + filter_date + [
+        Q('exists', field='fields.rp_mamafechanac'),
+        Q('regexp', groups__name='PUERPERIUM[^ ]*')
+    ])
+    aggs_puerperium = auxiliar_contacts_by_mom(q_puerperium, False)
+    aggs_pregnant = auxiliar_contacts_by_mom(q_pregnant,True)
+    dict_result = []
+    for v_1, v_2 in zip(aggs_pregnant,  aggs_puerperium):
+        dict_result.append( {"group":v_1["group"],
+                                     "count" :v_1["count"] +v_2["count"]}
+                          )
+    return dict_result
 
 
 @date_decorator('rp_duedate')
