@@ -142,10 +142,11 @@ def aggregate_by_hospital(q, single=True):
             size=2147483647)
 
 
-def aggregate_by_mom_age(q, single=True):
+def aggregate_by_mom_age(q, single=True, duedate=True):
     groups = [{"from": 35}, {"from": 19, "to": 35}, {"from": 0, "to": 19}]
 
-    duedate_str = "doc['fields.rp_duedate'].value"
+    duedate_str = "doc['fields.rp_duedate'].value" if duedate else "doc['fields.rp_deliverydate'].value"
+
     mombirth_str = "doc['fields.rp_mamafechanac'].value"
     milliseconds2years_str = "/ 1000 / 60 / 60 / 24 / 365"
     script_str = "({} - {}) {}".format(duedate_str, mombirth_str,
