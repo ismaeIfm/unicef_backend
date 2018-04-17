@@ -67,12 +67,12 @@ def view_users_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha de incio
-        default: "2016-8-20T00:00:00"
+        default: "2014-8-20T00:00:00"
       - name: end_date
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-4-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -96,12 +96,12 @@ def view_users_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha de incio
-        default: "2016-8-20T00:00:00"
+        default: "2014-8-20T00:00:00"
       - name: end_date
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-4-10T00:00:00"
       - name: state
         in : query
         description: Estado con el numero inegi
@@ -131,12 +131,12 @@ def view_users_by_mom_age(start_date, end_date):
         in: query
         type: string
         description: Fecha de incio
-        default: "2016-8-20T00:00:00"
+        default: "2014-8-20T00:00:00"
       - name: end_date
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-4-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -161,12 +161,12 @@ def view_users_by_baby_age(start_date, end_date):
         in: query
         type: string
         description: Fecha de incio
-        default: "2016-8-20T00:00:00"
+        default: "2014-8-20T00:00:00"
       - name: end_date
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-4-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -191,12 +191,12 @@ def view_users_by_hospital(start_date, end_date):
         in: query
         type: string
         description: Fecha de incio
-        default: "2016-8-20T00:00:00"
+        default: "2014-8-20T00:00:00"
       - name: end_date
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-4-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -220,12 +220,12 @@ def view_users_by_channel(start_date, end_date):
         in: query
         type: string
         description: Fecha de incio
-        default: "2016-8-20T00:00:00"
+        default: "2014-8-20T00:00:00"
       - name: end_date
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-4-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
