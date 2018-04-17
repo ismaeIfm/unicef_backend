@@ -107,16 +107,18 @@ def number_contacts_by_hospital(filter_date=[], query=[]):
 
 @date_decorator('created_on')
 def number_contacts_by_channel(filter_date=[], query=[]):
-    q = search_contact(filter_date + query + [
-        Q('match', urns='facebook'),
-        Q('exists', field='uuid')
-    ])
+    q =  search_contact(filter_date + query)
+    total = q.count()
+    q = search_contact(filter_date + query + [Q('match', urns='facebook')])
     facebook_contacts = q.count()
-
     q = search_contact(filter_date + query + [Q('match', urns='tel')])
     sms_contacts = q.count()
-
-    channels = {'facebook': facebook_contacts, 'sms': sms_contacts}
+    q = search_contact(filter_date + query + [Q('match', urns='twitterid')])
+    twitter_contacts = q.count()
+    channels = {'facebook': facebook_contacts,
+                'sms': sms_contacts,
+                'twitter': twitter_contacts,
+                'others': total - (facebook_contacts+sms_contacts+twitter_contacts)}
 
     return format_result(channels, key='key')
 
