@@ -67,7 +67,6 @@ def _get_difference_dates(start_date, end_date, element):
             result = relativedelta(
                 end_date.replace(tzinfo=None),
                 start_date.replace(tzinfo=None)).weeks
-
     return result if result >= 0 else None
 
 

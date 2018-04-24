@@ -42,9 +42,15 @@ CONTACT_FIELDS = {
 def parse_date_from_rp(field):
     if not field:
         return ""
+    if isinstance(field, datetime):
+        return field
     date_rp = field[:-1] if field[-1]=="." else field
     try:
-        parse_date = parse(parse(date_rp).strftime("%d-%m-%Y"))
+        match = re.match(r"([0-9]+)",date_rp, re.I)
+        if match and int(match.group()) <=31: #Then begin with days
+            parse_date = parse(parse(date_rp,dayfirst=True).strftime("%d-%m-%Y"))
+        else:
+            parse_date = parse(parse(date_rp).strftime("%d-%m-%Y"))
     except ValueError:
         parse_date = ""
     return parse_date
@@ -121,18 +127,22 @@ def get_type_flow(flow_name):
 
 
 def insert_run(run, path_item, action, c):
-    contact_age = _get_difference_dates(c.fields.rp_mamafechanac,
-                                        path_item.time, 'y')
-    baby_age = _get_difference_dates(path_item.time, c.fields.rp_deliverydate,
+    contact_age = _get_difference_dates(path_item.time, c.fields.rp_mamafechanac,'y')
+    baby_age = _get_difference_dates( c.fields.rp_deliverydate,
+                                      path_item.time,
                                      'm')
+
     pregnant_difference = _get_difference_dates(c.fields.rp_duedate,
-                                                path_item.time, 'w')
+                                                path_item.time,
+                                                'w')
     week_pregnant, trimester_baby_age = None, None
     if pregnant_difference and pregnant_difference <= 40:
         week_pregnant = 40 - pregnant_difference if pregnant_difference <= 40 else 41
     if baby_age and baby_age >= 0 and baby_age <= 24:
-        trimester_baby_age = baby_age // 3
+        trimester_baby_age = (baby_age+2) // 3
         c.update_baby_age(trimester_baby_age)
+        print (baby_age)
+        print (c.uuid)
 
     run_dict = {
         'urns': c.urns,
@@ -193,14 +203,17 @@ def update_runs(after=None, last_runs=None):
                         'rp_deliverydate'):
                     aux_c = c.to_dict()
                     del aux_c['uuid']
+                    c.fields["rp_duedate"]      = parse_date_from_rp(contact.fields.get('rp_duedate'))
+                    c.fields["rp_deliverydate"] = parse_date_from_rp(contact.fields.get('rp_deliverydate'))
                     Contact(**aux_c).save()
                     c.fields.rp_state_number = contact.fields.get('rp_mun')
                     c.fields.rp_ispregnant = contact.fields.get(
                         'rp_ispregnant')
                     c.fields.rp_state_number = contact.fields.get(
                         'rp_state_number')
-                    c.fields.rp_deliverydate = contact.fields.get(
-                        'rp_deliverydate')
+                    new_date =  contact.fields.get('rp_deliverydate')
+                    if new_date and  any(c.isdigit() for c in new_date):
+                        c.fields.rp_deliverydate = new_date
                     c.save()
         except IndexError:
             continue
@@ -252,7 +265,7 @@ def load_runs_from_csv(force=False):
                 if pregnant_difference and pregnant_difference <= 40:
                     week_pregnant = 40 - pregnant_difference if pregnant_difference <= 40 else 41
                 if baby_age and baby_age >= 0 and baby_age <= 24:
-                    trimester_baby_age = baby_age // 3
+                    trimester_baby_age = (baby_age +2)// 3
                     c.update_baby_age(trimester_baby_age)
                 run_dict = {
                     'urns': c.urns,
