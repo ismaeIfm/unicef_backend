@@ -131,32 +131,36 @@ def number_contacts_by_channel(filter_date=[], query=[]):
 @date_decorator('rp_deliverydate')
 def number_babies_by_state(query=[], filter_date=[]):
     return number_contacts_by_state(
-        query=filter_date + query + [Q('term', fields__rp_ispregnant='0')])
+        query=filter_date + query + [Q('regexp', groups__name='PUERPERIUM[^ ]*'),
+                                Q('match', fields__rp_ispregnant='0')])
 
 
 @date_decorator('rp_deliverydate')
 def number_babies_by_mun(state, filter_date=[], query=[]):
     return number_contacts_by_mun(
         state,
-        query=filter_date + query + [Q('term', fields__rp_ispregnant='0')])
+        query=filter_date + query + [Q('regexp', groups__name='PUERPERIUM[^ ]*'),
+                                Q('match', fields__rp_ispregnant='0')])
 
 
 @date_decorator('rp_deliverydate')
 def number_babies_by_mom_age(query=[], filter_date=[]):
     return number_contacts_by_mom_age(
-        query=filter_date + query + [Q('term', fields__rp_ispregnant='0')])
+        query=filter_date + query + [Q('regexp', groups__name='PUERPERIUM[^ ]*'),
+                                Q('match', fields__rp_ispregnant='0')])
 
 
 @date_decorator('rp_deliverydate')
 def number_babies_by_hospital(filter_date=[], query=[]):
     return number_contacts_by_hospital(
-        query=filter_date + query + [Q('term', fields__rp_ispregnant='0')])
+        query=filter_date + query + [Q('regexp', groups__name='PUERPERIUM[^ ]*')])
 
 
 @date_decorator('rp_duedate')
 def number_babies_by_week(filter_date=[]):
     return number_contacts_by_pregnant_weeks(
-        query=filter_date + [Q('term', fields__rp_ispregnant='0')])
+        query=filter_date + [Q('regexp', groups__name='PUERPERIUM[^ ]*'),
+                                Q('match', fields__rp_ispregnant='0')])
 
 
 #@date_decorator('rp_deliverydate')
