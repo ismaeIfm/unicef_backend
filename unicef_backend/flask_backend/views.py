@@ -40,8 +40,8 @@ def configure_duedate(start_date=None, end_date=None):
 ##################      Users part     ######################
 @api.route("/users_by_type", methods=['GET'])
 def view_user_by_type():
-    """Usuarios agrupados por tipo
-       El endpoint sin filtro de temporalidad
+    """Usuarios agrupados por tipo.
+       El endpoint sin filtro de temporalidad.
     ---
     tags:
       - Numero de participantes
@@ -56,9 +56,10 @@ def view_user_by_type():
 @api.route("/users_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_users_by_state(start_date, end_date):
-    """Usuarios agrupados por municipio
-       El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales
+    """Usuarios agrupados por municipio.
+       El endpoint utilizala fecha created_on de los contactos para filtrar por temporalidad.
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Numero de participantes
@@ -66,13 +67,13 @@ def view_users_by_state(start_date, end_date):
       - name: start_date
         in: query
         type: string
-        description: Fecha de incio
+        description: Fecha de inicio
         default: "2014-8-20T00:00:00"
       - name: end_date
         in: query
         type: string
         description: Fecha final
-        default: "2018-4-10T00:00:00"
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -85,9 +86,10 @@ def view_users_by_state(start_date, end_date):
 @api.route("/users_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_users_by_mun(state, start_date, end_date):
-    """Usuarios agrupados por estado
+    """Usuarios agrupados por estado basado en la clave INEGI
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales. El estado es obligatorio
+
+       **Las fechas son opcionales, el estado es obligatorio.
     ---
     tags:
       - Numero de participantes
@@ -101,10 +103,10 @@ def view_users_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-4-10T00:00:00"
+        default: "2018-5-10T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
         default: 29
         required: True
@@ -122,7 +124,9 @@ def view_users_by_mun(state, start_date, end_date):
 def view_users_by_mom_age(start_date, end_date):
     """Usuarios agrupados por edad de la madre cuando nacio su hijo
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Numero de participantes
@@ -136,7 +140,7 @@ def view_users_by_mom_age(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-4-10T00:00:00"
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -152,7 +156,8 @@ def view_users_by_mom_age(start_date, end_date):
 def view_users_by_baby_age(start_date, end_date):
     """Usuarios agrupados por edad del bebe
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Numero de participantes
@@ -166,7 +171,7 @@ def view_users_by_baby_age(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-4-10T00:00:00"
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -182,7 +187,8 @@ def view_users_by_baby_age(start_date, end_date):
 def view_users_by_hospital(start_date, end_date):
     """Usuarios agrupados por tipo de atencion medica
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Numero de participantes
@@ -196,7 +202,7 @@ def view_users_by_hospital(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-4-10T00:00:00"
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -211,7 +217,8 @@ def view_users_by_hospital(start_date, end_date):
 def view_users_by_channel(start_date, end_date):
     """Usuarios agrupados por canal de comunicacion
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Numero de participantes
@@ -225,7 +232,7 @@ def view_users_by_channel(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-4-10T00:00:00"
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -241,7 +248,8 @@ def view_users_by_channel(start_date, end_date):
 def view_babies_by_state(start_date, end_date):
     """Bebes agrupados por estado
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Numero de bebes
@@ -255,7 +263,7 @@ def view_babies_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -269,9 +277,10 @@ def view_babies_by_state(start_date, end_date):
 @api.route("/babies_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_babies_by_mun(state, start_date, end_date):
-    """Bebes agrupados por municipio dado un estado
+    """Bebes agrupados por municipio dado un estado basado en la clave INEGI
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales. El estado es obligatorio
+
+       **Los parametros de fechas son opcionales. El estado es obligatorio, con dos digitios (ejemplo: 09)
     ---
     tags:
       - Numero de bebes
@@ -285,10 +294,10 @@ def view_babies_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-10T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
         default: 29
         required: True
@@ -307,7 +316,8 @@ def view_babies_by_mun(state, start_date, end_date):
 def view_babies_by_week(start_date, end_date):
     """Bebes agrupados por la semana de gestacion al nacer.
        El endpoint utiliza la fecha rp_duedate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales.
+
+       **Ambos parametros son opcionales.
     ---
     tags:
       - Numero de bebes
@@ -321,7 +331,7 @@ def view_babies_by_week(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -337,7 +347,8 @@ def view_babies_by_week(start_date, end_date):
 def view_babies_by_mom_age(start_date, end_date):
     """Bebes agrupados por la edad de la mama cuando tuvieron al hijo.
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales.
+
+       **Ambos parametros son opcionales.
     ---
     tags:
       - Numero de bebes
@@ -351,7 +362,7 @@ def view_babies_by_mom_age(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -367,7 +378,8 @@ def view_babies_by_mom_age(start_date, end_date):
 def view_babies_by_hospital(start_date, end_date):
     """Bebes agrupados por el lugar de atencion medica
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales.
+
+       **Ambos parametros son opcionales.
     ---
     tags:
       - Numero de bebes
@@ -381,7 +393,7 @@ def view_babies_by_hospital(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -398,10 +410,11 @@ def view_babies_by_hospital(start_date, end_date):
 def view_pregnants_by_state(start_date, end_date):
     """Mujeres embarazadas por estado
        El endpoint utiliza la fecha rp_duedate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales.
+
+       **Ambos parametros son opcionales.
     ---
     tags:
-      - Estados
+      - Estados (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -412,7 +425,7 @@ def view_pregnants_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -428,10 +441,11 @@ def view_pregnants_by_state(start_date, end_date):
 def view_moms_by_state(start_date, end_date):
     """Madres por estado
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales.
+
+       **Ambos parametros son opcionales.
     ---
     tags:
-      - Estados
+      - Estados (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -442,7 +456,7 @@ def view_moms_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -458,10 +472,11 @@ def view_moms_by_state(start_date, end_date):
 def view_personal_by_state(start_date, end_date):
     """Personal por estado
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales.
+
+       **Ambos parametros son opcionales.
     ---
     tags:
-      - Estados
+      - Estados (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -472,7 +487,7 @@ def view_personal_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -487,10 +502,11 @@ def view_personal_by_state(start_date, end_date):
 def view_mom_age_by_state(start_date, end_date):
     """Madres agrupadas por estado y por edad
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales.
+
+       **Ambos parametros son opcionales.
     ---
     tags:
-      - Estados
+      - Estados (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -501,7 +517,7 @@ def view_mom_age_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -517,10 +533,11 @@ def view_mom_age_by_state(start_date, end_date):
 def view_baby_age_by_state(start_date, end_date):
     """Bebes agrupados por estado y por edad
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales.
+
+       **Ambos parametros son opcionales.
     ---
     tags:
-      - Estados
+      - Estados (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -531,7 +548,7 @@ def view_baby_age_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -547,10 +564,11 @@ def view_baby_age_by_state(start_date, end_date):
 def view_hospitals_by_state(start_date, end_date):
     """Usuarios agrupados por estado y lugar de atencion medica
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales.
+
+       **Ambos parametros son opcionales.
     ---
     tags:
-      - Estados
+      - Estados (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -561,7 +579,7 @@ def view_hospitals_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -576,10 +594,11 @@ def view_hospitals_by_state(start_date, end_date):
 def view_channel_by_state(start_date, end_date):
     """Usuarios agrupados por estado y canal de comunicacion
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales.
+
+       **Ambos parametros son opcionales.
     ---
     tags:
-      - Estados
+      - Estados (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -590,7 +609,7 @@ def view_channel_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
@@ -600,16 +619,17 @@ def view_channel_by_state(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-##################      Municipios part     ######################
+##################      Municipios (INEGI) part     ######################
 @api.route("/pregnants_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_pregnants_by_mun(state, start_date, end_date):
-    """Mujeres embarazadas agrupados por municipio dado un estado
+    """Mujeres embarazadas agrupados por municipio dado un estado basado en la clave INEGI
        El endpoint utiliza la fecha rp_duedate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales. El estado es obligatorio
+
+       **Los parametros de fechas son opcionales. El estado es obligatorio, con dos digitios (ejemplo: 09)
     ---
     tags:
-      - Municipios
+      - Municipios (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -620,10 +640,10 @@ def view_pregnants_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-10T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
         default: 29
         required: True
@@ -640,12 +660,13 @@ def view_pregnants_by_mun(state, start_date, end_date):
 @api.route("/moms_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_moms_by_mun(state, start_date, end_date):
-    """Madres agrupados por municipio dado un estado
+    """Madres agrupados por municipio dado un estado basado en la clave INEGI
        El endpoint utiliza la fecha rp_duedate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales. El estado es obligatorio
+
+      **Los parametros de fechas son opcionales. El estado es obligatorio, con dos digitios (ejemplo: 09)
     ---
     tags:
-      - Municipios
+      - Municipios (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -656,10 +677,10 @@ def view_moms_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
         default: 29
         required: True
@@ -676,12 +697,13 @@ def view_moms_by_mun(state, start_date, end_date):
 @api.route("/personal_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_personal_by_mun(state, start_date, end_date):
-    """Personal agrupados por municipio dado un estado
+    """Personal agrupados por municipio dado un estado basado en la clave INEGI
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales. El estado es obligatorio
+
+       **Los parametros de fechas son opcionales. El estado es obligatorio, con dos digitios (ejemplo: 09)
     ---
     tags:
-      - Municipios
+      - Municipios (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -692,12 +714,12 @@ def view_personal_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
-        default: 29
+        default: 09
         required: True
     responses:
       200:
@@ -713,10 +735,10 @@ def view_personal_by_mun(state, start_date, end_date):
 def view_mom_age_by_mun(state, start_date, end_date):
     """Madres agrupadas por municipio dado un estado y agrupadas por edad
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales. El estado es obligatorio
+       Los parametros de fechas son opcionales. El estado es obligatorio, con dos digitios (ejemplo: 09)
     ---
     tags:
-      - Municipios
+      - Municipios (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -730,7 +752,7 @@ def view_mom_age_by_mun(state, start_date, end_date):
         default: "2018-1-20T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
         default: 29
         required: True
@@ -749,10 +771,10 @@ def view_mom_age_by_mun(state, start_date, end_date):
 def view_baby_age_by_mun(state, start_date, end_date):
     """Bebes agrupados por municipio dado un estado y agrupados por edad
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales. El estado es obligatorio
+       Los parametros de fechas son opcionales. El estado es obligatorio, con dos digitios (ejemplo: 09)
     ---
     tags:
-      - Municipios
+      - Municipios (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -766,7 +788,7 @@ def view_baby_age_by_mun(state, start_date, end_date):
         default: "2018-1-20T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
         default: 29
         required: True
@@ -785,10 +807,11 @@ def view_baby_age_by_mun(state, start_date, end_date):
 def view_hospitals_by_mun(state, start_date, end_date):
     """Usuarios por municipio dado un estado y por atencion medica
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales. El estado es obligatorio
+
+       **Los parametros de fechas son opcionales. El estado es obligatorio, con dos digitios (ejemplo: 09)
     ---
     tags:
-      - Municipios
+      - Municipios (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -799,12 +822,12 @@ def view_hospitals_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
-        default: 29
+        default: 09
         required: True
     responses:
       200:
@@ -820,10 +843,11 @@ def view_hospitals_by_mun(state, start_date, end_date):
 def view_channel_by_mun(state, start_date, end_date):
     """Usuarios  agrupados por canal de comunicacion y  agrupados por municipio dado un estado
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales. El estado es obligatorio
+
+       **Los parametros de fechas son opcionales. El estado es obligatorio, con dos digitios (ejemplo: 09)
     ---
     tags:
-      - Municipios
+      - Municipios (INEGI)
     parameters:
       - name: start_date
         in: query
@@ -834,12 +858,12 @@ def view_channel_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
-        default: 29
+        default: 09
         required: True
     responses:
       200:
@@ -990,7 +1014,7 @@ def view_mialerta_by_mun(state, start_date, end_date):
         default: "2018-1-20T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
         default: 29
         required: True
@@ -1171,7 +1195,7 @@ def view_cancela_by_mun(state, start_date, end_date):
         default: "2018-1-20T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
         default: 29
         required: True
@@ -1410,7 +1434,7 @@ def view_msgs_by_mun(state, start_date, end_date):
         default: "2018-1-20T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
         default: 29
         required: True
@@ -1649,7 +1673,7 @@ def view_rate_by_mun(state,start_date, end_date):
         default: "2018-1-20T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
         default: 29
         required: True
@@ -1714,7 +1738,7 @@ def view_calidad_medica_by_mun(state, start_date, end_date):
         default: "2018-1-20T00:00:00"
       - name: state
         in : query
-        description: Estado con el numero inegi
+        description: Estado con el numero INEGI
         type: string
         default: 29
         required: True

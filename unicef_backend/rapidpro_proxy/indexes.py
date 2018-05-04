@@ -26,7 +26,7 @@ class Run(DocType):
     fields = Object(properties={
         'rp_ispregnant': Keyword(),
         'rp_state_number': Keyword(),
-        'rp_mun': Keyword(),
+        'rp_mun_cve': Keyword(),
         'rp_atenmed': Keyword(),
         'rp_razonalerta': Keyword(),
         'rp_razonbaja': Keyword(),
@@ -55,7 +55,7 @@ class Contact(DocType):
         'rp_deliverydate': Date(),
         'rp_state_number': Keyword(),
         'rp_ispregnant': Keyword(),
-        'rp_mun': Keyword(),
+        'rp_mun_cve': Keyword(),
         'rp_atenmed': Keyword(),
         'rp_mamafechanac': Date(),
         'rp_duedate': Date(),

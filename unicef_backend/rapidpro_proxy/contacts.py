@@ -187,7 +187,7 @@ def number_moms_by_state(filter_date=[]):
 @date_decorator('created_on')
 def number_personal_by_state(filter_date=[]):
     return number_contacts_by_state(filter_date +
-                                    [Q('term', groups__name='PERSONAL_SALUD')])
+                                    [Q('regexp', groups__name='PERSONAL_SALUD[^ ]*')])
 
 
 @date_decorator('rp_deliverydate')
@@ -275,7 +275,8 @@ def number_moms_by_mun(state, filter_date=[]):
 @date_decorator('created_on')
 def number_personal_by_mun(state, filter_date=[]):
     return number_contacts_by_mun(
-        state, query=filter_date + [Q('term', groups__name='PERSONAL_SALUD')])
+        state, query=filter_date +
+        [Q('regexp', groups__name='PERSONAL_SALUD[^ ]*')])
 
 
 @date_decorator('rp_deliverydate')

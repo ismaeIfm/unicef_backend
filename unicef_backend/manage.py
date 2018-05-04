@@ -25,7 +25,7 @@ CONTACT_FIELDS = {
     'rp_deliverydate': _format_date,
     'rp_state_number': _format_str,
     'rp_ispregnant': _format_str,
-    'rp_mun': _format_str,
+    'rp_mun_cve': _format_str,
     'rp_atenmed': _format_str,
     'rp_mamafechanac': _format_date,
     'rp_duedate': _format_date,
@@ -159,7 +159,7 @@ def insert_run(run, path_item, action, c):
         'fields': {
             'rp_ispregnant': _format_str(c.fields.rp_ispregnant),
             'rp_state_number': _format_str(c.fields.rp_state_number),
-            'rp_mun': _format_str(c.fields.rp_mun),
+            'rp_mun_cve': _format_str(c.fields.rp_mun_cve),
             'rp_atenmed': _format_str(c.fields.rp_atenmed),
             'rp_razonalerta': _format_str(c.fields.rp_razonalerta),
             'rp_razonbaja': _format_str(c.fields.rp_razonbaja),
@@ -194,7 +194,7 @@ def update_runs(after=None, last_runs=None):
                 contacts = mx_client.get_contacts(uuid=run.contact.uuid).all()
                 contact = contacts[0]
                 if c.fields.rp_state_number != contact.fields.get(
-                        'rp_mun'
+                        'rp_mun_cve'
                 ) or c.fields.rp_ispregnant != contact.fields.get(
                         'rp_ispregnant'
                 ) or c.fields.rp_state_number != contact.fields.get(
@@ -206,7 +206,7 @@ def update_runs(after=None, last_runs=None):
                     c.fields["rp_duedate"]      = parse_date_from_rp(contact.fields.get('rp_duedate'))
                     c.fields["rp_deliverydate"] = parse_date_from_rp(contact.fields.get('rp_deliverydate'))
                     Contact(**aux_c).save()
-                    c.fields.rp_state_number = contact.fields.get('rp_mun')
+                    c.fields.rp_state_number = contact.fields.get('rp_mun_cve')
                     c.fields.rp_ispregnant = contact.fields.get(
                         'rp_ispregnant')
                     c.fields.rp_state_number = contact.fields.get(
@@ -280,7 +280,7 @@ def load_runs_from_csv(force=False):
                         'rp_ispregnant': _format_str(c.fields.rp_ispregnant),
                         'rp_state_number':
                         _format_str(c.fields.rp_state_number),
-                        'rp_mun': _format_str(c.fields.rp_mun),
+                        'rp_mun_cve': _format_str(c.fields.rp_mun_cve),
                         'rp_atenmed': _format_str(c.fields.rp_atenmed),
                         'rp_razonalerta': _format_str(c.fields.rp_razonalerta),
                         'rp_razonbaja': _format_str(c.fields.rp_razonbaja),

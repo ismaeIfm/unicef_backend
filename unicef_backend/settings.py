@@ -26,7 +26,7 @@ CANCEL_NODE = "response_3"
 
 ##################### Contact fields constants #######################
 FIELDS_STATE = "fields.rp_state_number"
-FIELDS_MUN = "fields.rp_mun"
+FIELDS_MUN = "fields.rp_mun_cve"
 FIELDS_DELIVERY = "fields.rp_deliverydate"
 
 UPDATE_CONTACT_UUIDS = [
