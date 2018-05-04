@@ -881,7 +881,8 @@ def view_channel_by_mun(state, start_date, end_date):
 def view_mialerta_by_group(start_date, end_date):
     """Detonaciones de mialerta agrupados por grupo
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Mialerta
@@ -895,7 +896,7 @@ def view_mialerta_by_group(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -910,7 +911,8 @@ def view_mialerta_by_group(start_date, end_date):
 def view_mialerta_by_state(start_date, end_date):
     """Detonaciones de mialerta agrupados por estado
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Mialerta
@@ -924,7 +926,7 @@ def view_mialerta_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -939,7 +941,8 @@ def view_mialerta_by_state(start_date, end_date):
 def view_mialerta_by_mom_age(start_date, end_date):
     """Detonaciones de mialerta agrupados la edad de la mama
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Mialerta
@@ -953,7 +956,7 @@ def view_mialerta_by_mom_age(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -997,7 +1000,8 @@ def view_mialerta_by_baby_age(start_date, end_date):
 def view_mialerta_by_mun(state, start_date, end_date):
     """Detonaciones de mialerta agrupados por municipio dado un estado
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       ** Los parametros de fechas son opcionales. El estado es obligatorio, con dos digitios (ejemplo: 09)
     ---
     tags:
       - Mialerta
@@ -1011,12 +1015,12 @@ def view_mialerta_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
       - name: state
         in : query
         description: Estado con el numero INEGI
         type: string
-        default: 29
+        default: 09
         required: True
     responses:
       200:
@@ -1032,7 +1036,8 @@ def view_mialerta_by_mun(state, start_date, end_date):
 def view_mialerta_by_hospital(start_date, end_date):
     """Detonaciones de mialerta agrupados por atencion medica
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Mialerta
@@ -1046,7 +1051,7 @@ def view_mialerta_by_hospital(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1061,7 +1066,8 @@ def view_mialerta_by_hospital(start_date, end_date):
 def view_mialerta_by_channel(start_date, end_date):
     """Detonaciones de mialerta agrupados por canal de comunicacion
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Mialerta
@@ -1075,7 +1081,7 @@ def view_mialerta_by_channel(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1104,7 +1110,7 @@ def view_mialerta_msgs(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final

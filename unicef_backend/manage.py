@@ -141,8 +141,6 @@ def insert_run(run, path_item, action, c):
     if baby_age and baby_age >= 0 and baby_age <= 24:
         trimester_baby_age = (baby_age+2) // 3
         c.update_baby_age(trimester_baby_age)
-        print (baby_age)
-        print (c.uuid)
 
     run_dict = {
         'urns': c.urns,
@@ -168,7 +166,6 @@ def insert_run(run, path_item, action, c):
         'baby_age': trimester_baby_age,
         'pregnant_week': week_pregnant
     }
-
     r = Run(**run_dict)
     r.meta.parent = run.contact.uuid
     r.save()
@@ -181,16 +178,16 @@ def update_runs(after=None, last_runs=None):
     for run in last_runs:
         c = search_contact(run.contact.uuid)
         try:
-            if run.flow.uuid in settings.UPDATE_CONTACT_UUIDS:
+            if run.flow.uuid in [
+                    settings.MIALERTA_FLOW, settings.CANCEL_FLOW
+            ]:
                 contacts = mx_client.get_contacts(uuid=run.contact.uuid).all()
                 contact = contacts[0]
                 c.fields.rp_razonalerta = contact.fields.get('rp_razonalerta')
                 c.fields.rp_razonbaja = contact.fields.get('rp_razonbaja')
                 c.save()
 
-            elif run.flow.uuid in [
-                    settings.MIALERTA_FLOW, settings.CANCEL_FLOW
-            ]:
+            elif run.flow.uuid in settings.UPDATE_CONTACT_UUIDS:
                 contacts = mx_client.get_contacts(uuid=run.contact.uuid).all()
                 contact = contacts[0]
                 if c.fields.rp_state_number != contact.fields.get(
@@ -225,6 +222,10 @@ def update_runs(after=None, last_runs=None):
                 #We ignore the path item if has a split or a group action
                 continue
             insert_run(run, path_item, action, c)
+        #Now save the responses
+        #for key in run.values:
+        #    print ("Insertando run")
+        #    insert_run(run, run.values[key], {"action_id":"0", "msg":"save_response"}, c)
 
 
 def load_runs_from_csv(force=False):
@@ -336,18 +337,18 @@ def create_index():
 
 @manager.command
 def download_test_runs(force=False):
-    after = datetime.utcnow() - timedelta(days=2)
-    after = after.isoformat()
-    update_runs(after)
+    #after = datetime.utcnow() - timedelta(days=2)
+    #after = after.isoformat()
+    #update_runs(after)
     print("Descargando alerta")
     #Temporal download mialerta runs
     runs = mx_client.get_runs(flow=settings.MIALERTA_FLOW).all()
     update_runs(last_runs=runs)
 
-    print("Descargando cancela")
+    #print("Descargando cancela")
     #Temporal download cancela runs
-    runs = mx_client.get_runs(flow=settings.CANCEL_FLOW).all()
-    update_runs(last_runs=runs)
+    #runs = mx_client.get_runs(flow=settings.CANCEL_FLOW).all()
+    #update_runs(last_runs=runs)
 
 
 if __name__ == '__main__':
