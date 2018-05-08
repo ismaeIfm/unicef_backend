@@ -19,6 +19,11 @@ date_args = {
 mun_args = {'state': fields.Str(required=True)}
 mun_args.update(date_args)
 
+calidad_args = {'category': fields.Str(required=True)}
+calidad_args.update(date_args)
+
+calidad_mun_args = {'category': fields.Str(required=True)}
+calidad_mun_args.update(mun_args)
 
 def configure_deliverydate(start_date=None, end_date=None):
     if start_date:
@@ -59,7 +64,7 @@ def view_users_by_state(start_date, end_date):
     """Usuarios agrupados por municipio.
        El endpoint utilizala fecha created_on de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Numero de participantes
@@ -126,7 +131,7 @@ def view_users_by_mom_age(start_date, end_date):
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
 
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Numero de participantes
@@ -157,7 +162,7 @@ def view_users_by_baby_age(start_date, end_date):
     """Usuarios agrupados por edad del bebe
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Numero de participantes
@@ -188,7 +193,7 @@ def view_users_by_hospital(start_date, end_date):
     """Usuarios agrupados por tipo de atencion medica
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Numero de participantes
@@ -218,7 +223,7 @@ def view_users_by_channel(start_date, end_date):
     """Usuarios agrupados por canal de comunicacion
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Numero de participantes
@@ -249,7 +254,7 @@ def view_babies_by_state(start_date, end_date):
     """Bebes agrupados por estado
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Numero de bebes
@@ -317,7 +322,7 @@ def view_babies_by_week(start_date, end_date):
     """Bebes agrupados por la semana de gestacion al nacer.
        El endpoint utiliza la fecha rp_duedate de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales.
+       **Las fechas son opcionales.
     ---
     tags:
       - Numero de bebes
@@ -348,7 +353,7 @@ def view_babies_by_mom_age(start_date, end_date):
     """Bebes agrupados por la edad de la mama cuando tuvieron al hijo.
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales.
+       **Las fechas son opcionales.
     ---
     tags:
       - Numero de bebes
@@ -379,7 +384,7 @@ def view_babies_by_hospital(start_date, end_date):
     """Bebes agrupados por el lugar de atencion medica
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales.
+       **Las fechas son opcionales.
     ---
     tags:
       - Numero de bebes
@@ -411,7 +416,7 @@ def view_pregnants_by_state(start_date, end_date):
     """Mujeres embarazadas por estado
        El endpoint utiliza la fecha rp_duedate de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales.
+       **Las fechas son opcionales.
     ---
     tags:
       - Estados (INEGI)
@@ -442,7 +447,7 @@ def view_moms_by_state(start_date, end_date):
     """Madres por estado
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales.
+       **Las fechas son opcionales.
     ---
     tags:
       - Estados (INEGI)
@@ -473,7 +478,7 @@ def view_personal_by_state(start_date, end_date):
     """Personal por estado
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales.
+       **Las fechas son opcionales.
     ---
     tags:
       - Estados (INEGI)
@@ -503,7 +508,7 @@ def view_mom_age_by_state(start_date, end_date):
     """Madres agrupadas por estado y por edad
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales.
+       **Las fechas son opcionales.
     ---
     tags:
       - Estados (INEGI)
@@ -534,7 +539,7 @@ def view_baby_age_by_state(start_date, end_date):
     """Bebes agrupados por estado y por edad
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales.
+       **Las fechas son opcionales.
     ---
     tags:
       - Estados (INEGI)
@@ -565,7 +570,7 @@ def view_hospitals_by_state(start_date, end_date):
     """Usuarios agrupados por estado y lugar de atencion medica
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales.
+       **Las fechas son opcionales.
     ---
     tags:
       - Estados (INEGI)
@@ -595,7 +600,7 @@ def view_channel_by_state(start_date, end_date):
     """Usuarios agrupados por estado y canal de comunicacion
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales.
+       **Las fechas son opcionales.
     ---
     tags:
       - Estados (INEGI)
@@ -882,7 +887,7 @@ def view_mialerta_by_group(start_date, end_date):
     """Detonaciones de mialerta agrupados por grupo
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Mialerta
@@ -912,7 +917,7 @@ def view_mialerta_by_state(start_date, end_date):
     """Detonaciones de mialerta agrupados por estado
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Mialerta
@@ -942,7 +947,7 @@ def view_mialerta_by_mom_age(start_date, end_date):
     """Detonaciones de mialerta agrupados la edad de la mama
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Mialerta
@@ -971,7 +976,7 @@ def view_mialerta_by_mom_age(start_date, end_date):
 def view_mialerta_by_baby_age(start_date, end_date):
     """Detonaciones de mialerta agrupados la edad del bebe
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Mialerta
@@ -1037,7 +1042,7 @@ def view_mialerta_by_hospital(start_date, end_date):
     """Detonaciones de mialerta agrupados por atencion medica
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Mialerta
@@ -1067,7 +1072,7 @@ def view_mialerta_by_channel(start_date, end_date):
     """Detonaciones de mialerta agrupados por canal de comunicacion
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Mialerta
@@ -1096,7 +1101,7 @@ def view_mialerta_by_channel(start_date, end_date):
 def view_mialerta_by_type(start_date, end_date):
     """Top de razones de mialerta
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Mialerta
@@ -1126,7 +1131,7 @@ def view_mialerta_by_type(start_date, end_date):
 def view_cancela_by_group(start_date, end_date):
     """Detonaciones de cancela agrupados tipo de contacto
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Cancela
@@ -1156,7 +1161,7 @@ def view_cancela_by_state(start_date, end_date):
     """Detonaciones de cancela agrupados por estado  basado en la clave INEGI
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Cancela
@@ -1185,7 +1190,7 @@ def view_cancela_by_state(start_date, end_date):
 def view_cancela_by_mun(state, start_date, end_date):
     """Detonaciones de cancela agrupados por municipio
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Cancela
@@ -1221,7 +1226,7 @@ def view_cancela_by_hospital(start_date, end_date):
     """Detonaciones de cancela agrupados por atencion medica
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Cancela
@@ -1251,7 +1256,7 @@ def view_cancela_by_mom_age(start_date, end_date):
     """Detonaciones de cancela agrupados por la edad de la mama
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Cancela
@@ -1280,7 +1285,7 @@ def view_cancela_by_mom_age(start_date, end_date):
 def view_cancela_by_baby_age(start_date, end_date):
     """Detonaciones de cancela agrupados por la edad del bebe
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Cancela
@@ -1309,7 +1314,7 @@ def view_cancela_by_baby_age(start_date, end_date):
 def view_cancela_by_channel(start_date, end_date):
     """Detonaciones de cancela agrupados por canal de comunicacion
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Cancela
@@ -1340,7 +1345,7 @@ def view_msgs_by_topic(start_date, end_date):
     """Mensajes enviados agrupados por tema del mensaje
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
 
-       **Ambos parametros son opcionales
+       **Las fechas son opcionales
     ---
     tags:
       - Mensajes enviados
@@ -1370,7 +1375,7 @@ def view_msgs_by_topic(start_date, end_date):
 def view_rate_by_group(start_date, end_date):
     """Tasa de respuesta promedio por tipo de usuaria
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Tasa de respuesta
@@ -1399,7 +1404,7 @@ def view_rate_by_group(start_date, end_date):
 def view_rate_by_channel(start_date, end_date):
     """Tasa de respuesta promedio por canal de comunicacion
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Tasa de respuesta
@@ -1428,7 +1433,7 @@ def view_rate_by_channel(start_date, end_date):
 def view_rate_by_hospital(start_date, end_date):
     """Tasa de respuesta promedio por atencion medica
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Tasa de respuesta
@@ -1457,7 +1462,7 @@ def view_rate_by_hospital(start_date, end_date):
 def view_rate_by_message(start_date, end_date):
     """Tasa de respuesta promedio por mensajes
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Tasa de respuesta
@@ -1486,7 +1491,7 @@ def view_rate_by_message(start_date, end_date):
 def view_rate_by_mom_age(start_date, end_date):
     """Tasa de respuesta promedio por edad de la mama
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Tasa de respuesta
@@ -1515,7 +1520,7 @@ def view_rate_by_mom_age(start_date, end_date):
 def view_rate_by_state(start_date, end_date):
     """Tasa de respuesta promedio por estado
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Tasa de respuesta
@@ -1544,7 +1549,7 @@ def view_rate_by_state(start_date, end_date):
 def view_rate_by_mun(state,start_date, end_date):
     """Tasa de respuesta promedio por municipio
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+       Las fechas son opcionales
     ---
     tags:
       - Tasa de respuesta
@@ -1576,11 +1581,13 @@ def view_rate_by_mun(state,start_date, end_date):
 
 ##################### Calidad medica ##########################
 @api.route("/calidad_medica_by_state", methods=['GET'])
-@use_kwargs(date_args)
-def view_calidad_medica_by_state(start_date, end_date):
+@use_kwargs(calidad_args)
+def view_calidad_medica_by_state(start_date, end_date,category):
     """Calidad medica por estado
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Las fechas son opcionales. La categoria es obligatoria:
+       *** Las categorias validas son: calidad_antropometria, calidad_crecimuterino, calidad_lactancia, calidad_presionarterial, calidad_signosalarma, calidad_vacunas
     ---
     tags:
       - Calidad medica
@@ -1595,21 +1602,28 @@ def view_calidad_medica_by_state(start_date, end_date):
         type: string
         description: Fecha final
         default: "2018-1-20T00:00:00"
+      - name: category
+        in : query
+        description: Categoria de calidad
+        type: string
+        default: calidad_crecimuterino
+        required: True
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = contacts.get_calidad_medica_by_state(
-        "Calidad-Crecimuterino", start_date=start_date, end_date=end_date)
+    response = contacts.get_calidad_medica_by_state(category, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
 @api.route("/calidad_medica_by_mun", methods=['GET'])
-@use_kwargs(mun_args)
-def view_calidad_medica_by_mun(state, start_date, end_date):
+@use_kwargs(calidad_mun_args)
+def view_calidad_medica_by_mun(state, start_date, end_date,category):
     """Calidad medica por municipio dado un estado
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Las fechas son opcionales. La categoria es obligatoria:
+       *** Las categorias validas son: calidad_antropometria, calidad_crecimuterino, calidad_lactancia, calidad_presionarterial, calidad_signosalarma, calidad_vacunas
     ---
     tags:
       - Calidad medica
@@ -1630,24 +1644,32 @@ def view_calidad_medica_by_mun(state, start_date, end_date):
         type: string
         default: 29
         required: True
+      - name: category
+        in : query
+        description: Categoria de calidad
+        type: string
+        default: calidad_crecimuterino
+        required: True
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
     response = contacts.get_calidad_medica_by_mun(
         state,
-        "Calidad-Crecimuterino",
+        category,
         start_date=start_date,
         end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
 @api.route("/calidad_medica_by_hospital", methods=['GET'])
-@use_kwargs(date_args)
-def view_calidad_medica_by_hospital(start_date, end_date):
+@use_kwargs(calidad_args)
+def view_calidad_medica_by_hospital(start_date, end_date, category):
     """Calidad medica por atencion medica
        El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+        **Las fechas son opcionales. La categoria es obligatoria:
+        *** Las categorias validas son: calidad_antropometria, calidad_crecimuterino, calidad_lactancia, calidad_presionarterial, calidad_signosalarma, calidad_vacunas
     ---
     tags:
       - Calidad medica
@@ -1662,21 +1684,29 @@ def view_calidad_medica_by_hospital(start_date, end_date):
         type: string
         description: Fecha final
         default: "2018-1-20T00:00:00"
+      - name: category
+        in : query
+        description: Categoria de calidad
+        type: string
+        default: calidad_crecimuterino
+        required: True
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
     response = contacts.get_calidad_medica_by_hospital(
-        "Calidad-Crecimuterino", start_date=start_date, end_date=end_date)
+        category, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
 @api.route("/calidad_medica_by_mom_age", methods=['GET'])
-@use_kwargs(date_args)
-def view_calidad_medica_by_mom_age(start_date, end_date):
+@use_kwargs(calidad_args)
+def view_calidad_medica_by_mom_age(start_date, end_date, category):
     """Calidad medica por edad de la mama
        El endpoint utiliza la fecha rp_duedate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Las fechas son opcionales. La categoria es obligatoria:
+       *** Las categorias validas son: calidad_antropometria, calidad_crecimuterino, calidad_lactancia, calidad_presionarterial, calidad_signosalarma, calidad_vacunas
     ---
     tags:
       - Calidad medica
@@ -1691,22 +1721,30 @@ def view_calidad_medica_by_mom_age(start_date, end_date):
         type: string
         description: Fecha final
         default: "2018-1-20T00:00:00"
+      - name: category
+        in : query
+        description: Categoria de calidad
+        type: string
+        default: calidad_crecimuterino
+        required: True
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
     start_date, end_date = configure_duedate(start_date, end_date)
     response = contacts.get_calidad_medica_by_mom_age(
-        "Calidad-Crecimuterino", start_date=start_date, end_date=end_date)
+        category, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
 @api.route("/calidad_medica_by_baby_age", methods=['GET'])
-@use_kwargs(date_args)
-def view_calidad_medica_by_baby_age(start_date, end_date):
+@use_kwargs(calidad_args)
+def view_calidad_medica_by_baby_age(start_date, end_date, category):
     """Calidad medica por edad del bebe
        El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+      **Las fechas son opcionales. La categoria es obligatoria:
+      *** Las categorias validas son: calidad_antropometria, calidad_crecimuterino, calidad_lactancia, calidad_presionarterial, calidad_signosalarma, calidad_vacunas
     ---
     tags:
       - Calidad medica
@@ -1721,13 +1759,19 @@ def view_calidad_medica_by_baby_age(start_date, end_date):
         type: string
         description: Fecha final
         default: "2018-1-20T00:00:00"
+      - name: category
+        in : query
+        description: Categoria de calidad
+        type: string
+        default: calidad_crecimuterino
+        required: True
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
     start_date, end_date = configure_deliverydate(start_date, end_date)
     response = contacts.get_calidad_medica_by_baby_age(
-        "Calidad-Crecimuterino", start_date=start_date, end_date=end_date)
+        category, start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 

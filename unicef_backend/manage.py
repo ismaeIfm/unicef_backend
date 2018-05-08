@@ -314,7 +314,14 @@ def download_contacts(force=False):
             #Normalize date
             insert_one_contact(c)
 
-
+@manager.command
+def download_mvilchis(force=False):
+    contacts = mx_client.get_contacts(uuid="bf90a072-f9b0-4582-b82c-89b478e21f2f").all()
+    for c in tqdm(contacts, desc='==> Getting Contacts'):
+        #Only save misalud contacts
+        if not "MIGRACION_PD" in [i.name for i in c.groups]:
+            #Normalize date
+            insert_one_contact(c)
 @manager.command
 def delete_index(force=False):
     index = Index(settings.INDEX)
