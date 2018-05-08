@@ -127,21 +127,19 @@ def get_type_flow(flow_name):
 
 
 def insert_run(run, path_item, action, c):
-    contact_age = _get_difference_dates(path_item.time, c.fields.rp_mamafechanac,'y')
-    baby_age = _get_difference_dates( c.fields.rp_deliverydate,
-                                      path_item.time,
-                                     'm')
-
-    pregnant_difference = _get_difference_dates(c.fields.rp_duedate,
-                                                path_item.time,
-                                                'w')
+    contact_age = _get_difference_dates(start_date=c.fields.rp_mamafechanac, end_date=path_item.time,element='y')
+    baby_age = _get_difference_dates( start_date= c.fields.rp_deliverydate,
+                                      end_date = path_item.time,
+                                     element='m')
+    pregnant_difference = _get_difference_dates(start_date=c.fields.rp_duedate,
+                                                end_date=path_item.time,
+                                                element='w')
     week_pregnant, trimester_baby_age = None, None
     if pregnant_difference and pregnant_difference <= 40:
         week_pregnant = 40 - pregnant_difference if pregnant_difference <= 40 else 41
     if baby_age and baby_age >= 0 and baby_age <= 24:
         trimester_baby_age = (baby_age+2) // 3
         c.update_baby_age(trimester_baby_age)
-
     run_dict = {
         'urns': c.urns,
         'flow_uuid': run.flow.uuid,
@@ -340,15 +338,15 @@ def download_test_runs(force=False):
     #after = datetime.utcnow() - timedelta(days=2)
     #after = after.isoformat()
     #update_runs(after)
-    print("Descargando alerta")
+    #print("Descargando alerta")
     #Temporal download mialerta runs
-    runs = mx_client.get_runs(flow=settings.MIALERTA_FLOW).all()
-    update_runs(last_runs=runs)
-
-    #print("Descargando cancela")
-    #Temporal download cancela runs
-    #runs = mx_client.get_runs(flow=settings.CANCEL_FLOW).all()
+    #runs = mx_client.get_runs(flow=settings.MIALERTA_FLOW).all()
     #update_runs(last_runs=runs)
+
+    print("Descargando cancela")
+    #Temporal download cancela runs
+    runs = mx_client.get_runs(flow=settings.CANCEL_FLOW).all()
+    update_runs(last_runs=runs)
 
 
 if __name__ == '__main__':

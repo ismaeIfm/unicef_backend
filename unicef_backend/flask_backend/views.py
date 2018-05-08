@@ -956,7 +956,7 @@ def view_mialerta_by_mom_age(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-5-20T00:00:00"
+        default: "2018-05-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -985,7 +985,7 @@ def view_mialerta_by_baby_age(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -998,7 +998,7 @@ def view_mialerta_by_baby_age(start_date, end_date):
 @api.route("/mialerta_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_mialerta_by_mun(state, start_date, end_date):
-    """Detonaciones de mialerta agrupados por municipio dado un estado
+    """Detonaciones de mialerta agrupados por municipio dado un estado  basado en la clave INEGI
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
 
        ** Los parametros de fechas son opcionales. El estado es obligatorio, con dos digitios (ejemplo: 09)
@@ -1091,9 +1091,9 @@ def view_mialerta_by_channel(start_date, end_date):
     return make_response(jsonify({'response': response}), 200)
 
 
-@api.route("/mialerta_msgs", methods=['GET'])
+@api.route("/mialerta_by_type", methods=['GET'])
 @use_kwargs(date_args)
-def view_mialerta_msgs(start_date, end_date):
+def view_mialerta_by_type(start_date, end_date):
     """Top de razones de mialerta
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
        Ambos parametros son opcionales
@@ -1115,7 +1115,7 @@ def view_mialerta_msgs(start_date, end_date):
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
     """
-    response = flows.number_mialerta_msgs_top(
+    response = flows.total_number_mialerta(
         start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
@@ -1140,7 +1140,7 @@ def view_cancela_by_group(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1153,9 +1153,10 @@ def view_cancela_by_group(start_date, end_date):
 @api.route("/cancela_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_cancela_by_state(start_date, end_date):
-    """Detonaciones de cancela agrupados por estado
+    """Detonaciones de cancela agrupados por estado  basado en la clave INEGI
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Cancela
@@ -1169,7 +1170,7 @@ def view_cancela_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1198,12 +1199,12 @@ def view_cancela_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
       - name: state
         in : query
         description: Estado con el numero INEGI
         type: string
-        default: 29
+        default: 09
         required: True
     responses:
       200:
@@ -1219,7 +1220,8 @@ def view_cancela_by_mun(state, start_date, end_date):
 def view_cancela_by_hospital(start_date, end_date):
     """Detonaciones de cancela agrupados por atencion medica
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Cancela
@@ -1233,7 +1235,7 @@ def view_cancela_by_hospital(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1248,7 +1250,8 @@ def view_cancela_by_hospital(start_date, end_date):
 def view_cancela_by_mom_age(start_date, end_date):
     """Detonaciones de cancela agrupados por la edad de la mama
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Cancela
@@ -1262,7 +1265,7 @@ def view_cancela_by_mom_age(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1291,7 +1294,7 @@ def view_cancela_by_baby_age(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1320,7 +1323,7 @@ def view_cancela_by_channel(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final

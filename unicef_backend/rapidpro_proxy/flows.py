@@ -15,6 +15,7 @@ def _aux_number_by_state(flow_uuid, field, filter_date=[]):
     aggregate_by_state(q)
     aggregate_by_razon(q.aggs[BYSTATE_STR], field, single=False)
     response = q.execute()
+    print (response)
     return format_aggs_aggs_result(response, 'state', BYSTATE_STR, 'reason',
                                    BYRAZON)
 
@@ -51,9 +52,10 @@ def _aux_channel(flow_uuid, field, filter_date=[]):
 
 
 def _aux_number_by_channel(flow_uuid, field, filter_date=[]):
+    mapping = {'facebook':'facebook', 'tel':'tel', 'twitter':'twitterid'}
     return {
-        q: _aux_channel(flow_uuid, field, [Q('match', urns=q)] + filter_date)
-        for q in ['facebook', 'tel']
+        q: _aux_channel(flow_uuid, field, [Q('match', urns=mapping[q])] + filter_date)
+        for q in mapping.keys()
     }
 
 
@@ -80,8 +82,11 @@ def _aux_number_by_mom_age(flow_uuid, field, filter_date=[]):
                                    BYRAZON)
 
 
-def _aux_by_group(query, flow_uuid, field, filter_date=[]):
-    q = search_run(filter_date + [Q('term', flow_uuid=flow_uuid), query])
+def _aux_by_group(query=None, flow_uuid=None, field=None, filter_date=[]):
+    if query:
+        q = search_run(filter_date + [Q('term', flow_uuid=flow_uuid), query])
+    else:
+        q = search_run(filter_date + [Q('term', flow_uuid=flow_uuid)])
     aggregate_by_razon(q, field=field)
     response = q.execute()
     return format_aggs_result(response.aggregations[BYRAZON].buckets, 'reason')
@@ -234,15 +239,13 @@ def number_mialerta_by_mom_age(filter_date=[]):
 
 
 @date_decorator("time")
-def number_mialerta_msgs_top(filter_date=[]):
-    q = search_run(
-        filter_date +
-        [Q('term', flow_uuid='07d56699-9cfb-4dc6-805f-775989ff5b3f')])
-    aggregate_by_msg(q)
-    response = q.execute()
-    return format_aggs_result(response.aggregations[BYMSG_STR].buckets,
-                              'message')
-
+def total_number_mialerta(filter_date=[]):
+    result = {}
+    result["response"] =  _aux_by_group(
+        flow_uuid='07d56699-9cfb-4dc6-805f-775989ff5b3f',
+        field='fields.rp_razonalerta',
+        filter_date=filter_date)
+    return result
 
 ##########################################################################
 #                        Cancel part   (Use flow auxiliar methods)       #
@@ -255,17 +258,17 @@ def number_cancel_by_group(filter_date=[]):
     result = {}
     result['baby'] = _aux_by_group(
         query=Q('term', fields__rp_ispregnant='1'),
-        flow_uuid='dbd5738f-8700-4ece-8b8c-d68b3f4529f7',
+        flow_uuid= settings.CANCEL_FLOW,
         field='fields.rp_razonbaja',
         filter_date=filter_date)
     result['pregnant'] = _aux_by_group(
         query=Q('term', fields__rp_ispregnant='0'),
-        flow_uuid='dbd5738f-8700-4ece-8b8c-d68b3f4529f7',
+        flow_uuid= settings.CANCEL_FLOW,
         field='fields.rp_razonbaja',
         filter_date=filter_date)
     result['personal'] = _aux_by_group(
         query=Q('term', groups__name='PERSONAL_SALUD'),
-        flow_uuid='dbd5738f-8700-4ece-8b8c-d68b3f4529f7',
+        flow_uuid= settings.CANCEL_FLOW,
         field='fields.rp_razonbaja',
         filter_date=filter_date)
     return result
@@ -274,7 +277,7 @@ def number_cancel_by_group(filter_date=[]):
 @date_decorator("time")
 def number_cancel_by_state(filter_date=[]):
     return _aux_number_by_state(
-        flow_uuid='dbd5738f-8700-4ece-8b8c-d68b3f4529f7',
+        flow_uuid= settings.CANCEL_FLOW,
         field='fields.rp_razonbaja',
         filter_date=filter_date)
 
@@ -283,7 +286,7 @@ def number_cancel_by_state(filter_date=[]):
 def number_cancel_by_mun(state, filter_date=[]):
     return _aux_number_by_mun(
         state,
-        flow_uuid='dbd5738f-8700-4ece-8b8c-d68b3f4529f7',
+        flow_uuid= settings.CANCEL_FLOW,
         field='fields.rp_razonbaja',
         filter_date=filter_date)
 
@@ -291,7 +294,7 @@ def number_cancel_by_mun(state, filter_date=[]):
 @date_decorator('time')
 def number_cancel_by_hospital(filter_date=[]):
     return _aux_number_by_hospital(
-        flow_uuid='dbd5738f-8700-4ece-8b8c-d68b3f4529f7',
+        flow_uuid= settings.CANCEL_FLOW,
         field='fields.rp_razonbaja',
         filter_date=filter_date)
 
@@ -299,7 +302,7 @@ def number_cancel_by_hospital(filter_date=[]):
 @date_decorator('time')
 def number_cancel_by_channel(filter_date=[]):
     return _aux_number_by_channel(
-        flow_uuid='dbd5738f-8700-4ece-8b8c-d68b3f4529f7',
+        flow_uuid= settings.CANCEL_FLOW,
         field='fields.rp_razonbaja',
         filter_date=filter_date)
 
@@ -307,7 +310,7 @@ def number_cancel_by_channel(filter_date=[]):
 @date_decorator("time")
 def number_cancel_by_baby_age(filter_date=[]):
     return _aux_number_by_baby_age(
-        flow_uuid='dbd5738f-8700-4ece-8b8c-d68b3f4529f7',
+        flow_uuid= settings.CANCEL_FLOW,
         field='fields.rp_razonbaja',
         filter_date=filter_date)
 
@@ -315,7 +318,7 @@ def number_cancel_by_baby_age(filter_date=[]):
 @date_decorator("time")
 def number_cancel_by_mom_age(filter_date=[]):
     return _aux_number_by_mom_age(
-        flow_uuid='dbd5738f-8700-4ece-8b8c-d68b3f4529f7',
+        flow_uuid= settings.CANCEL_FLOW,
         field='fields.rp_razonbaja',
         filter_date=filter_date)
 

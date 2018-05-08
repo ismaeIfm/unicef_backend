@@ -254,6 +254,17 @@ def number_channel_by_state(filter_date=[]):
         i['key']: i['doc_count']
         for i in response.aggregations[BYSTATE_STR].buckets
     }
+
+    q = search_contact(filter_date +
+                       [Q('match', urns='twitterid'),
+                        Q('exists', field='uuid')])
+    aggregate_by_state(q)
+    response = q.execute()
+    result['twitter'] = {
+        i['key']: i['doc_count']
+        for i in response.aggregations[BYSTATE_STR].buckets
+    }
+
     return result
 
 
@@ -348,6 +359,17 @@ def number_channel_by_mun(state, filter_date=[]):
     aggregate_by_mun(q)
     response = q.execute()
     result['sms'] = {
+        i['key']: i['doc_count']
+        for i in response.aggregations[BYMUN_STR].buckets
+    }
+    q = search_contact(filter_date + [
+        Q('term', fields__rp_state_number=state),
+        Q('match', urns='twitterid'),
+        Q('exists', field='uuid')
+    ])
+    aggregate_by_mun(q)
+    response = q.execute()
+    result['twitter'] = {
         i['key']: i['doc_count']
         for i in response.aggregations[BYMUN_STR].buckets
     }
