@@ -151,7 +151,7 @@ def insert_run(run, path_item, action, c):
         'msg': action['msg'],
         'responded': run.responded,
         'exit_type': run.exit_type,
-        'is_one_way': False if run.values else True,
+        'is_one_way': False if run.values and run.responded else True,
         'fields': {
             'rp_ispregnant': _format_str(c.fields.rp_ispregnant),
             'rp_state_number': _format_str(c.fields.rp_state_number),
@@ -175,6 +175,8 @@ def update_runs(after=None, last_runs=None):
             retry_on_rate_exceed=True)
     for run in last_runs:
         c = search_contact(run.contact.uuid)
+        if get_type_flow(run.flow.name) == "otros" and not run.flow.uuid in [settings.CANCEL_FLOW, settings.MIALERTA_FLOW]:
+            continue
         try:
             if run.flow.uuid in [
                     settings.MIALERTA_FLOW, settings.CANCEL_FLOW
@@ -220,11 +222,7 @@ def update_runs(after=None, last_runs=None):
                 #We ignore the path item if has a split or a group action
                 continue
             insert_run(run, path_item, action, c)
-        #Now save the responses
-        #for key in run.values:
-        #    print ("Insertando run")
-        #    insert_run(run, run.values[key], {"action_id":"0", "msg":"save_response"}, c)
-
+            break #Only run first msg
 
 def load_runs_from_csv(force=False):
     import csv
@@ -335,13 +333,13 @@ def create_index():
 
 @manager.command
 def download_test_runs(force=False):
-    #after = datetime.utcnow() - timedelta(days=2)
-    #after = after.isoformat()
-    #update_runs(after)
-    #print("Descargando alerta")
+    after = datetime.utcnow() - timedelta(days=2)
+    after = after.isoformat()
+    update_runs(after)
+    print("Descargando alerta")
     #Temporal download mialerta runs
-    #runs = mx_client.get_runs(flow=settings.MIALERTA_FLOW).all()
-    #update_runs(last_runs=runs)
+    runs = mx_client.get_runs(flow=settings.MIALERTA_FLOW).all()
+    update_runs(last_runs=runs)
 
     print("Descargando cancela")
     #Temporal download cancela runs

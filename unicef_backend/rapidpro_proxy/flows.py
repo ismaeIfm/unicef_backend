@@ -15,7 +15,6 @@ def _aux_number_by_state(flow_uuid, field, filter_date=[]):
     aggregate_by_state(q)
     aggregate_by_razon(q.aggs[BYSTATE_STR], field, single=False)
     response = q.execute()
-    print (response)
     return format_aggs_aggs_result(response, 'state', BYSTATE_STR, 'reason',
                                    BYRAZON)
 
@@ -98,75 +97,13 @@ def _aux_by_group(query=None, flow_uuid=None, field=None, filter_date=[]):
 
 
 @date_decorator('time')
-def number_sent_msgs_by_state(filter_date=[]):
-    alta_flows = [{'match': {'flow_uuid': i}} for i in settings.ALTA_FLOW_UUIDS]
-    q = search_run(filter_date + [Q('bool',must_not=alta_flows)])
-    aggregate_by_state(q)
-    aggregate_by_msg(q.aggs[BYSTATE_STR], single=False)
-    aggregate_by_flow(q.aggs[BYSTATE_STR].aggs[BYMSG_STR], single=False)
-    response = q.execute()
-    return format_aggs_aggs_result_msg(response, 'state', BYSTATE_STR, 'msg',
-                                   BYMSG_STR,'flow',BYFLOW_STR)
-
-
-@date_decorator('time')
-def number_sent_msgs_by_mun(state, filter_date=[]):
-    alta_flows = [{'match': {'flow_uuid': i}} for i in settings.ALTA_FLOW_UUIDS]
-    q = search_run(filter_date + [Q('bool',must_not=alta_flows)]+
-                                 [Q('term', fields__rp_state_number=state)])
-    aggregate_by_mun(q)
-    aggregate_by_msg(q.aggs[BYMUN_STR], single=False)
-    aggregate_by_flow(q.aggs[BYMUN_STR].aggs[BYMSG_STR], single=False)
-    response = q.execute()
-    return format_aggs_aggs_result_msg(response, 'municipio', BYMUN_STR, 'msg',
-                                   BYMSG_STR,'flow',BYFLOW_STR)
-
-
-@date_decorator('time')
-def number_sent_msgs_by_mom_age(filter_date=[]):
-    alta_flows = [{'match': {'flow_uuid': i}} for i in settings.ALTA_FLOW_UUIDS]
-    q = search_run(filter_date + [Q('bool',must_not=alta_flows)] +
-        [Q("has_parent",
-          parent_type='contact',
-          query=Q(
-              'bool',
-              minimum_should_match=1,
-              should=[
-                  Q('match', fields__rp_ispregnant='1'),
-                  Q('match', fields__rp_ispregnant='0')
-              ]))
-    ])
-    aggregate_by_mom_age_run(q)
-    aggregate_by_msg(q.aggs[BYMOMAGE_STR], single=False)
-    aggregate_by_flow(q.aggs[BYMOMAGE_STR].aggs[BYMSG_STR], single=False)
-    response = q.execute()
-    return format_aggs_aggs_result_msg(response, 'age', BYMOMAGE_STR, 'msg',
-                                   BYMSG_STR,'flow',BYFLOW_STR)
-
-
-@date_decorator('time')
 def number_sent_msgs_by_flow(filter_date=[]):
-    alta_flows = [{'match': {'flow_uuid': i}} for i in settings.ALTA_FLOW_UUIDS]
-    q = search_run(filter_date + [Q('bool',must_not=alta_flows)])
+    bureaucratic_flows = [{'match': {'flow_uuid': i}} for i in [settings.CANCEL_FLOW, settings.MIALERTA_FLOW]]
+    q = search_run(filter_date + [Q('bool',must_not=bureaucratic_flows)])
     aggregate_by_flow(q)
     response = q.execute()
     return format_aggs_result(response.aggregations[BYFLOW_STR].buckets,
                               'categoria')
-
-
-@date_decorator('time')
-def number_sent_msgs_by_baby_age(filter_date=[]):
-    alta_flows = [{'match': {'flow_uuid': i}} for i in settings.ALTA_FLOW_UUIDS]
-    q = search_run(filter_date + [Q('bool',must_not=alta_flows)])
-    aggregate_by_baby_age(q)
-    aggregate_by_msg(q.aggs[BYBABYAGE_STR], single=False)
-    aggregate_by_flow(q.aggs[BYBABYAGE_STR].aggs[BYMSG_STR], single=False)
-
-    response = q.execute()
-
-    return format_aggs_aggs_result_msg(response, 'trimester', BYBABYAGE_STR, 'msg',
-                                   BYMSG_STR,'flow',BYFLOW_STR)
-
 
 ##########################################################################
 #                         Mi alerta       (use flow auxiliar methods)    #
@@ -337,15 +274,15 @@ def number_cancel_by_mom_age(filter_date=[]):
 def aux_rate_completed_messages(query, filter_date=[]):
     try:
         total = search_run(filter_date + [query]).count()
-        q = search_run(filter_date + [query, Q('term', exit_type='completed')])
-        aggregate_by_way(q)
+        bureaucratic_flows = [{'match': {'flow_uuid': i}} for i in [settings.CANCEL_FLOW, settings.MIALERTA_FLOW]]
 
+        q = search_run(filter_date + [query,Q('bool',must_not=bureaucratic_flows),Q('term', exit_type='completed')])
+        aggregate_by_way(q)
         response = q.execute()
         runs_completed = {
             i['key']: i['doc_count']
             for i in response.aggregations[BYWAY_STR].buckets
         }
-
         return (runs_completed.get(0, 0) /
                 (total - runs_completed.get(1, 0))) * 100
     except ZeroDivisionError:
@@ -369,10 +306,11 @@ def rate_completed_messages_by_group(filter_date=[]):
 
 @date_decorator('time')
 def rate_completed_messages_by_channel(filter_date=[]):
+    mapping = {'facebook':'facebook', 'tel':'tel', 'twitter':'twitterid'}
 
     return {
-        q: aux_rate_completed_messages(Q('match', urns=q), filter_date)
-        for q in ['facebook', 'tel']
+        q: aux_rate_completed_messages(Q('match', urns=mapping[q]), filter_date)
+        for q in  mapping.keys()
     }
 
 
@@ -413,12 +351,14 @@ def rate_completed_messages_by_hospital(filter_date=[]):
 
 @date_decorator('time')
 def rate_completed_messages_by_message(filter_date=[]):
-    q = search_run(filter_date)
+    bureaucratic_flows = [{'match': {'flow_uuid': i}} for i in [settings.CANCEL_FLOW, settings.MIALERTA_FLOW]]
+    q = search_run(filter_date + [Q('bool',must_not=bureaucratic_flows)] + [Q('term', responded=True)])
     aggregate_by_msg(q)
     filter_completed(q.aggs[BYMSG_STR])
     aggregate_by_way(q.aggs[BYMSG_STR].aggs[FILTERCOMPLETED_STR], single=False)
+    aggregate_by_flow(q.aggs[BYMSG_STR].aggs[FILTERCOMPLETED_STR].aggs[BYWAY_STR], single=False)
     response = q.execute()
-    return format_rate_completed_messages(response.aggregations[BYMSG_STR],
+    return format_rate_completed_messages_by_msgs(response.aggregations[BYMSG_STR],
                                           'message')
 
 

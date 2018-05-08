@@ -272,6 +272,26 @@ def format_aggs_aggs_result(result, key_1, bucket_1, key_2, bucket_2):
         } for j in i[bucket_2].buckets]
     } for i in result.aggregations[bucket_1].buckets if i[bucket_2].buckets]
 
+def format_rate_completed_messages_by_msgs(result, key):
+    formatted_result = []
+    for i in result:
+        total = i['doc_count']
+        type_msg ="otros"
+        if i[FILTERCOMPLETED_STR][BYWAY_STR].buckets:
+            if i[FILTERCOMPLETED_STR][BYWAY_STR].buckets[0][BYFLOW_STR]:
+                type_msg = i[FILTERCOMPLETED_STR][BYWAY_STR].buckets[0][BYFLOW_STR][0]["key"]
+        runs_completed = {
+            j['key']: j['doc_count']
+            for j in i[FILTERCOMPLETED_STR][BYWAY_STR]
+        }
+        try:
+            rate = (runs_completed.get(0, 0) /
+                    (total - runs_completed.get(1, 0))) * 100
+        except ZeroDivisionError:
+            rate = 0
+
+        formatted_result.append({key: i['key'], 'rate': rate, 'type':type_msg})
+    return sorted(formatted_result, key = lambda x:x["rate"], reverse=True)
 
 def format_rate_completed_messages(result, key):
     formatted_result = []

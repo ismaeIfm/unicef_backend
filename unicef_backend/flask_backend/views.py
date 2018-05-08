@@ -749,7 +749,7 @@ def view_mom_age_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: state
         in : query
         description: Estado con el numero INEGI
@@ -785,7 +785,7 @@ def view_baby_age_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: state
         in : query
         description: Estado con el numero INEGI
@@ -1334,132 +1334,6 @@ def view_cancela_by_channel(start_date, end_date):
 
 
 ##################      msgs part     ######################
-@api.route("/msgs_by_state", methods=['GET'])
-@use_kwargs(date_args)
-def view_msgs_by_state(start_date, end_date):
-    """Mensajes enviados por estado con base en la clave INEGI
-       El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-
-       **Ambos parametros son opcionales
-    ---
-    tags:
-      - Mensajes enviados
-    parameters:
-      - name: start_date
-        in: query
-        type: string
-        description: Fecha de incio
-        default: "2016-8-20T00:00:00"
-      - name: end_date
-        in: query
-        type: string
-        description: Fecha final
-        default: "2018-5-20T00:00:00"
-    responses:
-      200:
-        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
-    """
-    response = flows.number_sent_msgs_by_state(
-        start_date=start_date, end_date=end_date)
-    return make_response(jsonify({'response': response}), 200)
-
-
-@api.route("/msgs_by_mom_age", methods=['GET'])
-@use_kwargs(date_args)
-def view_msgs_by_mom_age(start_date, end_date):
-    """Mensajes enviados agrupados por la edad de la mama
-       El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-
-       **Ambos parametros son opcionales
-    ---
-    tags:
-      - Mensajes enviados
-    parameters:
-      - name: start_date
-        in: query
-        type: string
-        description: Fecha de incio
-        default: "2016-8-20T00:00:00"
-      - name: end_date
-        in: query
-        type: string
-        description: Fecha final
-        default: "2018-05-20T00:00:00"
-    responses:
-      200:
-        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
-    """
-    response = flows.number_sent_msgs_by_mom_age(
-        start_date=start_date, end_date=end_date)
-    return make_response(jsonify({'response': response}), 200)
-
-
-@api.route("/msgs_by_baby_age", methods=['GET'])
-@use_kwargs(date_args)
-def view_msgs_by_baby_age(start_date, end_date):
-    """Mensajes enviados agrupados por la edad del bebe
-       El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-
-       ** Ambos parametros son opcionales
-    ---
-    tags:
-      - Mensajes enviados
-    parameters:
-      - name: start_date
-        in: query
-        type: string
-        description: Fecha de incio
-        default: "2016-8-20T00:00:00"
-      - name: end_date
-        in: query
-        type: string
-        description: Fecha final
-        default: "2018-05-20T00:00:00"
-    responses:
-      200:
-        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
-    """
-    response = flows.number_sent_msgs_by_baby_age(
-        start_date=start_date, end_date=end_date)
-    return make_response(jsonify({'response': response}), 200)
-
-
-@api.route("/msgs_by_mun", methods=['GET'])
-@use_kwargs(mun_args)
-def view_msgs_by_mun(state, start_date, end_date):
-    """Mensajes enviados agrupados por municipio dado un estado con base en la clave INEGI
-       El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-
-       **Ambos parametros son opcionales
-    ---
-    tags:
-      - Mensajes enviados
-    parameters:
-      - name: start_date
-        in: query
-        type: string
-        description: Fecha de incio
-        default: "2016-8-20T00:00:00"
-      - name: end_date
-        in: query
-        type: string
-        description: Fecha final
-        default: "2018-05-20T00:00:00"
-      - name: state
-        in : query
-        description: Estado con el numero INEGI
-        type: string
-        default: 09
-        required: True
-    responses:
-      200:
-        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
-    """
-    response = flows.number_sent_msgs_by_mun(
-        state, start_date=start_date, end_date=end_date)
-    return make_response(jsonify({'response': response}), 200)
-
-
 @api.route("/msgs_by_topic", methods=['GET'])
 @use_kwargs(date_args)
 def view_msgs_by_topic(start_date, end_date):
@@ -1510,7 +1384,7 @@ def view_rate_by_group(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1539,7 +1413,7 @@ def view_rate_by_channel(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1568,7 +1442,7 @@ def view_rate_by_hospital(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1597,7 +1471,7 @@ def view_rate_by_message(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1626,7 +1500,7 @@ def view_rate_by_mom_age(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1655,7 +1529,7 @@ def view_rate_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1684,7 +1558,7 @@ def view_rate_by_mun(state,start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: state
         in : query
         description: Estado con el numero INEGI
