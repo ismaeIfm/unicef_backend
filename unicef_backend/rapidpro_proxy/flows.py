@@ -99,31 +99,34 @@ def _aux_by_group(query=None, flow_uuid=None, field=None, filter_date=[]):
 
 @date_decorator('time')
 def number_sent_msgs_by_state(filter_date=[]):
-    q = search_run(filter_date)
+    alta_flows = [{'match': {'flow_uuid': i}} for i in settings.ALTA_FLOW_UUIDS]
+    q = search_run(filter_date + [Q('bool',must_not=alta_flows)])
     aggregate_by_state(q)
     aggregate_by_msg(q.aggs[BYSTATE_STR], single=False)
-
+    aggregate_by_flow(q.aggs[BYSTATE_STR].aggs[BYMSG_STR], single=False)
     response = q.execute()
-    return format_aggs_aggs_result(response, 'state', BYSTATE_STR, 'msg',
-                                   BYMSG_STR)
+    return format_aggs_aggs_result_msg(response, 'state', BYSTATE_STR, 'msg',
+                                   BYMSG_STR,'flow',BYFLOW_STR)
 
 
 @date_decorator('time')
 def number_sent_msgs_by_mun(state, filter_date=[]):
-    q = search_run(filter_date + [Q('term', fields__rp_state_number=state)])
+    alta_flows = [{'match': {'flow_uuid': i}} for i in settings.ALTA_FLOW_UUIDS]
+    q = search_run(filter_date + [Q('bool',must_not=alta_flows)]+
+                                 [Q('term', fields__rp_state_number=state)])
     aggregate_by_mun(q)
     aggregate_by_msg(q.aggs[BYMUN_STR], single=False)
-
+    aggregate_by_flow(q.aggs[BYMUN_STR].aggs[BYMSG_STR], single=False)
     response = q.execute()
-
-    return format_aggs_aggs_result(response, 'municipio', BYMUN_STR, 'msg',
-                                   BYMSG_STR)
+    return format_aggs_aggs_result_msg(response, 'municipio', BYMUN_STR, 'msg',
+                                   BYMSG_STR,'flow',BYFLOW_STR)
 
 
 @date_decorator('time')
 def number_sent_msgs_by_mom_age(filter_date=[]):
-    q = search_run(filter_date + [
-        Q("has_parent",
+    alta_flows = [{'match': {'flow_uuid': i}} for i in settings.ALTA_FLOW_UUIDS]
+    q = search_run(filter_date + [Q('bool',must_not=alta_flows)] +
+        [Q("has_parent",
           parent_type='contact',
           query=Q(
               'bool',
@@ -135,14 +138,16 @@ def number_sent_msgs_by_mom_age(filter_date=[]):
     ])
     aggregate_by_mom_age_run(q)
     aggregate_by_msg(q.aggs[BYMOMAGE_STR], single=False)
+    aggregate_by_flow(q.aggs[BYMOMAGE_STR].aggs[BYMSG_STR], single=False)
     response = q.execute()
-    return format_aggs_result(response.aggregations[BYMOMAGE_STR].buckets,
-                              'age')
+    return format_aggs_aggs_result_msg(response, 'age', BYMOMAGE_STR, 'msg',
+                                   BYMSG_STR,'flow',BYFLOW_STR)
 
 
 @date_decorator('time')
 def number_sent_msgs_by_flow(filter_date=[]):
-    q = search_run(filter_date)
+    alta_flows = [{'match': {'flow_uuid': i}} for i in settings.ALTA_FLOW_UUIDS]
+    q = search_run(filter_date + [Q('bool',must_not=alta_flows)])
     aggregate_by_flow(q)
     response = q.execute()
     return format_aggs_result(response.aggregations[BYFLOW_STR].buckets,
@@ -151,15 +156,16 @@ def number_sent_msgs_by_flow(filter_date=[]):
 
 @date_decorator('time')
 def number_sent_msgs_by_baby_age(filter_date=[]):
-    q = search_run(filter_date)
-
+    alta_flows = [{'match': {'flow_uuid': i}} for i in settings.ALTA_FLOW_UUIDS]
+    q = search_run(filter_date + [Q('bool',must_not=alta_flows)])
     aggregate_by_baby_age(q)
     aggregate_by_msg(q.aggs[BYBABYAGE_STR], single=False)
+    aggregate_by_flow(q.aggs[BYBABYAGE_STR].aggs[BYMSG_STR], single=False)
 
     response = q.execute()
 
-    return format_aggs_aggs_result(response, 'trimester', BYBABYAGE_STR, 'msg',
-                                   BYMSG_STR)
+    return format_aggs_aggs_result_msg(response, 'trimester', BYBABYAGE_STR, 'msg',
+                                   BYMSG_STR,'flow',BYFLOW_STR)
 
 
 ##########################################################################

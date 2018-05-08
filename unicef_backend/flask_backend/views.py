@@ -108,7 +108,7 @@ def view_users_by_mun(state, start_date, end_date):
         in : query
         description: Estado con el numero INEGI
         type: string
-        default: 29
+        default: 09
         required: True
     responses:
       200:
@@ -1337,9 +1337,10 @@ def view_cancela_by_channel(start_date, end_date):
 @api.route("/msgs_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_msgs_by_state(start_date, end_date):
-    """Mensajes enviados por estado
+    """Mensajes enviados por estado con base en la clave INEGI
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Mensajes enviados
@@ -1353,7 +1354,7 @@ def view_msgs_by_state(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1368,7 +1369,8 @@ def view_msgs_by_state(start_date, end_date):
 def view_msgs_by_mom_age(start_date, end_date):
     """Mensajes enviados agrupados por la edad de la mama
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Mensajes enviados
@@ -1382,7 +1384,7 @@ def view_msgs_by_mom_age(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1397,7 +1399,8 @@ def view_msgs_by_mom_age(start_date, end_date):
 def view_msgs_by_baby_age(start_date, end_date):
     """Mensajes enviados agrupados por la edad del bebe
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       ** Ambos parametros son opcionales
     ---
     tags:
       - Mensajes enviados
@@ -1411,7 +1414,7 @@ def view_msgs_by_baby_age(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
@@ -1424,9 +1427,10 @@ def view_msgs_by_baby_age(start_date, end_date):
 @api.route("/msgs_by_mun", methods=['GET'])
 @use_kwargs(mun_args)
 def view_msgs_by_mun(state, start_date, end_date):
-    """Mensajes enviados agrupados por municipio dado un estado
+    """Mensajes enviados agrupados por municipio dado un estado con base en la clave INEGI
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Mensajes enviados
@@ -1440,12 +1444,12 @@ def view_msgs_by_mun(state, start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
       - name: state
         in : query
         description: Estado con el numero INEGI
         type: string
-        default: 29
+        default: 09
         required: True
     responses:
       200:
@@ -1461,7 +1465,8 @@ def view_msgs_by_mun(state, start_date, end_date):
 def view_msgs_by_topic(start_date, end_date):
     """Mensajes enviados agrupados por tema del mensaje
        El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
-       Ambos parametros son opcionales
+
+       **Ambos parametros son opcionales
     ---
     tags:
       - Mensajes enviados
@@ -1475,7 +1480,7 @@ def view_msgs_by_topic(start_date, end_date):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-05-20T00:00:00"
     responses:
       200:
         description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final

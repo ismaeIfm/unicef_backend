@@ -211,8 +211,11 @@ def aggregate_by_msg(q, single=True):
 
 
 def aggregate_by_flow(q, single=True):
-    a = A('terms', field='type', size=10)
-    q.aggs.bucket(BYFLOW_STR, a)
+    if single:
+        a = A('terms', field='type', size=10)
+        q.aggs.bucket(BYFLOW_STR, a)
+    else:
+        q.bucket(BYFLOW_STR, 'terms', field='type',size=10)
 
 
 def aggregate_by_way(q, single=True):
@@ -247,6 +250,17 @@ def format_aggs_result(result, key):
 def format_result(result, key):
     return [{key: k, 'count': v} for k, v in result.items()]
 
+
+def format_aggs_aggs_result_msg(result, key_1, bucket_1, key_2, bucket_2, key_3, bucket_3):
+    return [{
+        key_1:
+        i['key'],
+        'result': [{
+            key_2: j['key'],
+            'count': j['doc_count'],
+            'type': j[bucket_3].buckets[0]["key"] if j[bucket_3].buckets else "otros"
+        } for j in sorted(i[bucket_2].buckets, key = lambda x: x['doc_count'], reverse=True) ]
+    } for i in result.aggregations[bucket_1].buckets if i[bucket_2].buckets]
 
 def format_aggs_aggs_result(result, key_1, bucket_1, key_2, bucket_2):
     return [{

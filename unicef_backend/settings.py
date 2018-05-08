@@ -38,3 +38,16 @@ UPDATE_CONTACT_UUIDS = [
     '6178e212-f2d8-4abb-aeaf-613299941ff4',
     '989664a7-4ee0-407b-a1d6-cdb90845b996'
 ]
+
+ALTA_FLOW_UUIDS = [
+    "4eac87f3-d3ae-4dbb-978c-d07539fe8bef",
+    "661a1f90-2576-48df-81ec-9c860e28aede",
+    "b7a7844a-868d-4c05-84a6-ac5a584393eb",
+    "4679d331-ddd2-42dc-92a3-ed7f8ed1b46f",
+    "a57e73f3-b377-43ae-b1e4-7f2790a6768f",
+    "c6dda0c8-48cf-4154-a747-31777fa3951a",
+    "29d05006-9d0e-44cc-ae92-4c0bf173277a",
+    "047b4c02-5d2d-4eb2-b9e0-554fa371ec96",
+    "20308c47-002a-446c-a4f8-a21482f66bc8",
+    "04bac821-d956-48b4-90ac-eaff325184a0"
+    ]
