@@ -1601,7 +1601,7 @@ def view_calidad_medica_by_state(start_date, end_date,category):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: category
         in : query
         description: Categoria de calidad
@@ -1637,7 +1637,7 @@ def view_calidad_medica_by_mun(state, start_date, end_date,category):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: state
         in : query
         description: Estado con el numero INEGI
@@ -1683,7 +1683,7 @@ def view_calidad_medica_by_hospital(start_date, end_date, category):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: category
         in : query
         description: Categoria de calidad
@@ -1720,7 +1720,7 @@ def view_calidad_medica_by_mom_age(start_date, end_date, category):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: category
         in : query
         description: Categoria de calidad
@@ -1758,7 +1758,7 @@ def view_calidad_medica_by_baby_age(start_date, end_date, category):
         in: query
         type: string
         description: Fecha final
-        default: "2018-1-20T00:00:00"
+        default: "2018-5-20T00:00:00"
       - name: category
         in : query
         description: Categoria de calidad
