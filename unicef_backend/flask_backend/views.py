@@ -248,6 +248,36 @@ def view_users_by_channel(start_date, end_date):
 
 
 ##################      Babies part     ######################
+@api.route("/babies_by_channel", methods=['GET'])
+@use_kwargs(date_args)
+def view_babies_by_channel(start_date, end_date):
+    """Bebes agrupados por estado
+       El endpoint utiliza la fecha rp_deliverydate de los contactos para filtrar por temporalidad.
+       **Las fechas son opcionales
+    ---
+    tags:
+      - Numero de bebes
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-5-10T00:00:00"
+    responses:
+      200:
+        description: Los usuarios pueden ser filtrados por fecha de inicio y fecha final
+    """
+    start_date, end_date = configure_deliverydate(start_date, end_date)
+    response = contacts.number_babies_by_channel(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
+
 @api.route("/babies_by_state", methods=['GET'])
 @use_kwargs(date_args)
 def view_babies_by_state(start_date, end_date):
@@ -1126,6 +1156,34 @@ def view_mialerta_by_type(start_date, end_date):
 
 
 ##################      cancela part     ######################
+@api.route("/cancela_by_type", methods=['GET'])
+@use_kwargs(date_args)
+def view_cancela_by_type(start_date, end_date):
+    """Top de razones de cancela
+       El endpoint utiliza la fecha time de los runs para filtrar por temporalidad.
+       Las fechas son opcionales
+    ---
+    tags:
+      - Cancela
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-5-20T00:00:00"
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = flows.total_number_cancel(
+        start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
 @api.route("/cancela_by_group", methods=['GET'])
 @use_kwargs(date_args)
 def view_cancela_by_group(start_date, end_date):
@@ -1580,6 +1638,41 @@ def view_rate_by_mun(state,start_date, end_date):
 
 
 ##################### Calidad medica ##########################
+@api.route("/calidad_medica_by_channel", methods=['GET'])
+@use_kwargs(calidad_args)
+def view_calidad_medica_by_channel(start_date, end_date,category):
+    """Calidad medica por estado
+       El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
+
+       **Las fechas son opcionales. La categoria es obligatoria:
+       *** Las categorias validas son: calidad_antropometria, calidad_crecimuterino, calidad_lactancia, calidad_presionarterial, calidad_signosalarma, calidad_vacunas
+    ---
+    tags:
+      - Calidad medica
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-5-20T00:00:00"
+      - name: category
+        in : query
+        description: Categoria de calidad
+        type: string
+        default: calidad_presionarterial
+        required: True
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = contacts.get_calidad_medica_by_channel(category, start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
+
 @api.route("/calidad_medica_by_state", methods=['GET'])
 @use_kwargs(calidad_args)
 def view_calidad_medica_by_state(start_date, end_date,category):

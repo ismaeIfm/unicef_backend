@@ -127,6 +127,11 @@ def number_contacts_by_channel(filter_date=[], query=[]):
 #                             Babies part                                #
 ##########################################################################
 
+@date_decorator('rp_deliverydate')
+def number_babies_by_channel(query=[], filter_date=[]):
+    return number_contacts_by_channel(
+        query=filter_date + query + [Q('regexp', groups__name='PUERPERIUM[^ ]*'),
+                                Q('match', fields__rp_ispregnant='0')])
 
 @date_decorator('rp_deliverydate')
 def number_babies_by_state(query=[], filter_date=[]):
@@ -413,6 +418,44 @@ def get_calidad_medica_by_hospital(calidad_field, filter_date=[]):
 
     return format_aggs_aggs_result(response, 'hospital', BYHOSPITAL_STR,
                                    'calidad', BYCALIDAD_STR)
+
+@date_decorator('created_on')
+def get_calidad_medica_by_channel(calidad_field, filter_date=[]):
+    result = {}
+    a = A('terms', field='fields.'+calidad_field)
+
+    q = search_contact(filter_date + [Q('exists', field='uuid')])
+    q = search_contact(
+        filter_date + [Q('match', urns='facebook'),
+                       Q('exists', field='uuid')])
+    q.aggs.bucket(BYCALIDAD_STR, a)
+    response = q.execute()
+    result['facebook'] = {
+        i['key']: i['doc_count']
+        for i in response.aggregations[BYCALIDAD_STR].buckets
+    }
+
+    q = search_contact(filter_date +
+                       [Q('match', urns='tel'),
+                        Q('exists', field='uuid')])
+    q.aggs.bucket(BYCALIDAD_STR, a)
+    response = q.execute()
+    result['sms'] = {
+        i['key']: i['doc_count']
+        for i in response.aggregations[BYCALIDAD_STR].buckets
+    }
+
+    q = search_contact(filter_date +
+                       [Q('match', urns='twitterid'),
+                        Q('exists', field='uuid')])
+    q.aggs.bucket(BYCALIDAD_STR, a)
+    response = q.execute()
+    result['twitter'] = {
+        i['key']: i['doc_count']
+        for i in response.aggregations[BYCALIDAD_STR].buckets
+    }
+
+    return result
 
 
 @date_decorator('rp_duedate')

@@ -194,6 +194,15 @@ def total_number_mialerta(filter_date=[]):
 #                        Cancel part   (Use flow auxiliar methods)       #
 ##########################################################################
 
+@date_decorator("time")
+def total_number_cancel(filter_date=[]):
+    result = {}
+    result["response"] =  _aux_by_group(
+        flow_uuid=settings.CANCEL_FLOW,
+        field='fields.rp_razonbaja',
+        filter_date=filter_date)
+    return result
+
 
 #cambiar por fields
 @date_decorator("time")
