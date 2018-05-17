@@ -7,6 +7,7 @@ from flask_backend.config import config
 
 from flask_backend.views import *
 from flasgger import Swagger
+from flask_cors import CORS
 
 
 celery = Celery()
@@ -26,6 +27,7 @@ def create_app(config_name=None):
     if config_name is None:
         config_name = os.environ.get('CONFIG', 'development')
     app = Flask(__name__)
+    CORS(app)
     app.config.from_object(config[config_name])
     celery.config_from_object(app.config)
 
