@@ -1868,6 +1868,41 @@ def view_calidad_medica_by_baby_age(start_date, end_date, category):
     return make_response(jsonify({'response': response}), 200)
 
 
+
+@api.route("/calidad_medica_by_pregnant_week", methods=['GET'])
+@use_kwargs(calidad_args)
+def view_calidad_medica_by_pregnant_week(start_date, end_date,category):
+    """Calidad medica por semana al nacer del bebe
+       El endpoint utiliza la fecha created_on de los contactos para filtrar por temporalidad.
+
+       **Las fechas son opcionales. La categoria es obligatoria:
+       *** Las categorias validas son: calidad_antropometria, calidad_crecimuterino, calidad_lactancia, calidad_presionarterial, calidad_signosalarma, calidad_vacunas
+    ---
+    tags:
+      - Calidad medica
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de incio
+        default: "2016-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-5-20T00:00:00"
+      - name: category
+        in : query
+        description: Categoria de calidad
+        type: string
+        default: calidad_presionarterial
+        required: True
+    responses:
+      200:
+        description: Las detonaciones pueden ser filtrados por fecha de inicio y fecha final
+    """
+    response = contacts.get_calidad_medica_by_pregnant_weeks(category, start_date=start_date, end_date=end_date)
+    return make_response(jsonify({'response': response}), 200)
 """
 curl -X POST \
   http://localhost:5000/users_by_mun \
