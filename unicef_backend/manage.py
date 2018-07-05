@@ -91,9 +91,14 @@ def insert_one_contact(c):
     if week_birth:
         week_birth = 0 if week_birth <= 0 else week_birth
         contact["pregnant_week"] = 40 - week_birth
-    cs = Contact(**contact)
-    cs.save()
-    return cs
+    if  any(["PREGNANT" in g.name for g in c.groups ]) or \
+        any(["PUERPERIUM" in g.name for g in c.groups ]) or \
+        any(["PERSONAL_SALUD" in g.name for g in c.groups ]):
+        cs = Contact(**contact)
+        cs.save()
+        return cs
+    else:
+        return None
 
 
 def search_contact(uuid):
@@ -175,6 +180,8 @@ def update_runs(after=None, last_runs=None):
             retry_on_rate_exceed=True)
     for run in last_runs:
         c = search_contact(run.contact.uuid)
+        if not c:
+            continue
         if get_type_flow(run.flow.name) == "otros" and not run.flow.uuid in [settings.CANCEL_FLOW, settings.MIALERTA_FLOW]:
             continue
         try:
@@ -224,76 +231,6 @@ def update_runs(after=None, last_runs=None):
             insert_run(run, path_item, action, c)
             break #Only run first msg
 
-def load_runs_from_csv(force=False):
-    import csv
-    import ast
-    path = None
-    with open('runs.csv') as csvfile:
-        reader = csv.DictReader(csvfile, delimiter='|')
-        for row in reader:
-            flow_uuid = row["flow_uuid"].strip()
-            flow_name = row["flow_name"].strip() if row["flow_name"] else ""
-            contact_uuid = row["contact_uuid"].strip() if row[
-                "contact_uuid"] else ""
-            responded = row["responded"]
-            exit_type = row["exit_type"]
-            is_one_way = row["values"]
-            if not row["path"]:
-                continue
-            path = row["path"].strip().replace("null", '"null"')
-            c = search_contact(contact_uuid)
-            if not c:
-                continue
-            for path_item in ast.literal_eval(path):
-                try:
-                    action = Action.get(
-                        id=path_item["node_uuid"])  # Search action
-                except NotFoundError:
-                    #We ignore the path item if has a split or a group action
-                    continue
-                path_item_time = parse(path_item["arrived_on"])
-                contact_age = _get_difference_dates(c.fields.rp_mamafechanac,
-                                                    path_item_time, 'y')
-                baby_age = _get_difference_dates(path_item_time,
-                                                 c.fields.rp_deliverydate, 'm')
-                pregnant_difference = _get_difference_dates(
-                    c.fields.rp_duedate, path_item_time, 'w')
-                week_pregnant, trimester_baby_age = None, None
-                if pregnant_difference and pregnant_difference <= 40:
-                    week_pregnant = 40 - pregnant_difference if pregnant_difference <= 40 else 41
-                if baby_age and baby_age >= 0 and baby_age <= 24:
-                    trimester_baby_age = (baby_age +2)// 3
-                    c.update_baby_age(trimester_baby_age)
-                run_dict = {
-                    'urns': c.urns,
-                    'flow_uuid': flow_uuid,
-                    'flow_name': flow_name,
-                    'contact_uuid': contact_uuid,
-                    'type': get_type_flow(flow_name),
-                    'action_uuid': action['action_id'],
-                    'time': path_item_time,
-                    'msg': action['msg'],
-                    'fields': {
-                        'rp_ispregnant': _format_str(c.fields.rp_ispregnant),
-                        'rp_state_number':
-                        _format_str(c.fields.rp_state_number),
-                        'rp_mun_cve': _format_str(c.fields.rp_mun_cve),
-                        'rp_atenmed': _format_str(c.fields.rp_atenmed),
-                        'rp_razonalerta': _format_str(c.fields.rp_razonalerta),
-                        'rp_razonbaja': _format_str(c.fields.rp_razonbaja),
-                        'contact_age': contact_age,
-                    },
-                    'baby_age': trimester_baby_age,
-                    'pregnant_week': week_pregnant,
-                    'responded': responded,
-                    'exit_type': exit_type,
-                    'is_one_way': is_one_way
-                }
-                r = Run(**run_dict)
-                r.meta.parent = contact_uuid
-                r.save()
-
-
 def load_flows():
     Action.init()
     data = json.load(open('actions.json'))
@@ -314,14 +251,6 @@ def download_contacts(force=False):
             #Normalize date
             insert_one_contact(c)
 
-@manager.command
-def download_mvilchis(force=False):
-    contacts = mx_client.get_contacts(uuid="bf90a072-f9b0-4582-b82c-89b478e21f2f").all()
-    for c in tqdm(contacts, desc='==> Getting Contacts'):
-        #Only save misalud contacts
-        if not "MIGRACION_PD" in [i.name for i in c.groups]:
-            #Normalize date
-            insert_one_contact(c)
 @manager.command
 def delete_index(force=False):
     index = Index(settings.INDEX)
