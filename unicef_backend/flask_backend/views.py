@@ -44,7 +44,8 @@ def configure_duedate(start_date=None, end_date=None):
 
 ##################      Users part     ######################
 @api.route("/users_by_type", methods=['GET'])
-def view_user_by_type():
+@use_kwargs(date_args)
+def view_user_by_type(start_date, end_date):
     """Usuarios agrupados por tipo.
        El endpoint sin filtro de temporalidad.
     ---
@@ -54,7 +55,7 @@ def view_user_by_type():
       200:
         description: Usuarios agrupados por tipo de usuario
     """
-    response = contacts.number_contacts_by_group()
+    response = contacts.number_contacts_by_group(start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
 
