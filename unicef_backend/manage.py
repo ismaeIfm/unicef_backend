@@ -217,7 +217,7 @@ def update_runs(after=None, last_runs=None):
                         'rp_state_number')
                     new_date =  contact.fields.get('rp_deliverydate')
                     if new_date and  any(c.isdigit() for c in new_date):
-                        c.fields.rp_deliverydate = new_date
+                        c.fields.rp_deliverydate = parse_date_from_rp(new_date)
                     c.save()
         except IndexError:
             continue
