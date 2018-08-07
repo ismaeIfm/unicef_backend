@@ -47,10 +47,23 @@ def configure_duedate(start_date=None, end_date=None):
 @use_kwargs(date_args)
 def view_user_by_type(start_date, end_date):
     """Usuarios agrupados por tipo.
-       El endpoint sin filtro de temporalidad.
+       El endpoint utilizala fecha created_on de los contactos para filtrar por temporalidad.
+
+       **Las fechas son opcionales
     ---
     tags:
       - Numero de participantes
+    parameters:
+      - name: start_date
+        in: query
+        type: string
+        description: Fecha de inicio
+        default: "2014-8-20T00:00:00"
+      - name: end_date
+        in: query
+        type: string
+        description: Fecha final
+        default: "2018-5-10T00:00:00"
     responses:
       200:
         description: Usuarios agrupados por tipo de usuario
