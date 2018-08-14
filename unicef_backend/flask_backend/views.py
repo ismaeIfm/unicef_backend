@@ -68,6 +68,8 @@ def view_user_by_type(start_date, end_date):
       200:
         description: Usuarios agrupados por tipo de usuario
     """
+    other, end_date = configure_duedate(start_date, end_date)
+    start_date, other = configure_deliverydate(start_date, end_date)
     response = contacts.number_contacts_by_group(start_date=start_date, end_date=end_date)
     return make_response(jsonify({'response': response}), 200)
 
